@@ -1,0 +1,61 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "build-VS",
+      "generator": "Visual Studio 17 2022",
+      "toolset": "fortran=ifx",
+      "binaryDir": "${sourceDir}/${presetName}",
+      "cacheVariables": {
+        "CMAKE_Fortran_COMPILER": "C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifx.exe"
+      }
+    },
+    {
+      "name": "build-VS26",
+      "generator": "Visual Studio 18 2026",
+      "toolset": "fortran=ifx",
+      "binaryDir": "${sourceDir}/${presetName}",
+      "cacheVariables": {
+        "CMAKE_Fortran_COMPILER": "C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifx.exe"
+      }
+    },
+    {
+      "name": "build-ninja-release",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_Fortran_COMPILER": "C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifx.exe"
+      }
+    },
+    {
+      "name": "build-ninja-debug",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_Fortran_COMPILER": "C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifx.exe"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "VS-Debug",
+      "configurePreset": "build-VS",
+      "configuration": "debug"
+    },
+    {
+      "name": "VS-Release",
+      "configurePreset": "build-VS",
+      "configuration": "release"
+    },
+    {
+      "name": "VS26-Debug",
+      "configurePreset": "build-VS26",
+      "configuration": "debug"
+    },
+    {
+      "name": "VS26-Release",
+      "configurePreset": "build-VS26",
+      "configuration": "release"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+version: 2
+plan:
+  project-key: CROM # impossible to change, relic of Cryogenic Modelling
+  key: REIMS
+  name: reims
+  description: Plan for REIMS
+repositories:
+- reims:
+    scope: project
+stages:
+- myStage:
+    jobs:
+    - Compilation
+    - Documentation
+Compilation:
+  key: CMP
+  artifacts:
+  - name: reims
+    location: K:\Artifacts\reims
+    pattern: '*.*'
+  requirements:
+  - Windows agent
+  - Sharepoint access
+  tasks:
+  - checkout:
+      force-clean-build: false
+      description: Checkout Default Repository
+  - script:
+      interpreter: BINSH_OR_CMDEXE
+      description: 'Generating REIMS executable'
+      file: bamboo-specs/CreateREIMS.bat
+Documentation:
+  key: DOC
+  artifacts:
+  - name: docs
+    location: docs
+    pattern: '*.zip'
+  requirements:
+  - Windows agent
+  - Sharepoint access
+  tasks:
+  - checkout:
+      force-clean-build: false
+      description: Checkout Default Repository
+  - script:
+      interpreter: WINDOWS_POWER_SHELL
+      description: 'Generating FORD documentation'
+      file: bamboo-specs/docs.ps1

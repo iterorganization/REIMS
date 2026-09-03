@@ -1,0 +1,1365 @@
+# yaml-language-server: $schema=http://json-schema.org/draft-07/schema#
+$schema: http://json-schema.org/draft-07/schema#
+title: Top level configuration
+description: |
+ The top level configuration consists of 3 required elements:
+
+  - simulation
+  - write_results
+  - components
+
+ and optional elements:
+
+  - external_libs
+  - friction_correlations
+  - nusselt_correlations
+  - materials
+
+ Description of each element is provided below.
+
+type: object
+required: [simulation,write_results,components]
+properties:
+  simulation:
+    title: Simulation parameters
+    type: object
+    required: [simulation_end,implicit_tolerance]
+    properties:
+      simulation_end:
+        $ref: '#/$defs/numeric_value'
+        title: End of simulation (s)
+      FrictionRS:
+        $ref: '#/$defs/bool'
+        default: yes
+        title: Friction within Riemann solver + junctions
+        description: |
+          Value if nothing is specified by the user: ``yes``
+                 
+          - ``yes``: Simulation will consider friction within Riemann solver - useful in case
+            of high dP + coarse mesh
+          
+          - ``no``: No correction within the Riemann solver - Friction still active but potentially
+            less accurate in case of high dP + coarse mesh
+      R_correction:
+        $ref: '#/$defs/bool'
+        default: yes
+        title: Mechanical equilibrium correction - Introduction of an extra fluid equation 
+        description: |
+          Value if nothing is specified by the user: ``yes``
+
+          - ``yes``: Mechanical equilibrium correction is activated - Useful in case
+            of density discontinuity + coarse mesh close to the critical region
+          
+          - ``no``: No mechanical equilibrium correction - Less accurate in case of density 
+            discontinuity + coarse mesh close to the critical region - More accurate  
+            and robust far from critical region
+      explicit_tolerance:
+        $ref: '#/$defs/numeric_value'     
+        title: Criteria for switching from explicit to implicit
+        description:  |
+          Value if nothing is specified by the user: ``9e-4``
+
+          Reducing this value leads to prioritizing the explicit scheme over the implicit scheme.
+          We therefore expect further flow stabilization before the implicit scheme is activated.
+        default: 9.0e-4           
+      implicit_tolerance:
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/0D_signal'
+        default: 5.0e-4
+        title: Tolerance of implicit solver
+        description:   |
+          Reducing this value leads to longer computation times due to the use of smaller time
+          steps, but potentially increased robustness.
+      step_controller_gain:
+        $ref: '#/$defs/numeric_value'
+        title: Gain of PI controller
+        default: 4.0
+        description:    |
+          Value if nothing is specified by the user: ``4.0``
+
+          This value is related to automatic time step management - It is advised to modify
+          implicit_tolerance and keep the default value of the gain.
+      max_time_step:
+        $ref: '#/$defs/numeric_value'
+        title: Maximum time step (s)
+        default: 50.0
+        description: 'Value if nothing is specified by the user: ``50.0``'
+  write_results:
+    type: object
+    properties:
+      active:
+        $ref: '#/$defs/bool'
+        title: Writing results to hdf5 files activation
+        default: true
+        description:   |
+          Value if nothing is specified by the user: ``true``
+      file:
+        type: string
+        title: File name to store output data
+      minimum_time:
+        $ref: '#/$defs/numeric_value'
+        title: Minimum space between saved points (s)
+        default: 0.0
+        description:   |
+          Value if nothing is specified by the user: ``0.0``
+      active2D:
+        $ref: '#/$defs/bool'
+        title: Writing to results to hdf5 files  - Mesh2D components     
+        default: true
+        description:   |
+          Value if nothing is specified by the user: ``true`` 
+      time_between_2D_writes:
+        $ref: '#/$defs/numeric_value'
+        title: Time interval between two consecutive 2D result writes (s)
+        default: 3600.0
+        description:   |
+          Value if nothing is specified by the user: ``3600.0``          
+    required: [file]
+  external_libs:
+    title: External dynamic libraries
+    $ref: '#/$defs/1D_string'
+    description: |
+      Optional list of dynamic libraries (DLL) to load at startup.
+      Each entry is the library name without the ``.dll`` extension.
+
+      .. code:: yaml
+
+        external_libs:
+        - name_of_my_dll_1
+        - name_of_my_dll_2
+  friction_correlations:
+    title: Fanning friction factor correlations
+    type: array
+    items:
+      type: object
+      required: [friction]
+      properties:
+        friction:
+          type: string
+          title: Correlation name
+          description: |
+            Unique name used to reference this correlation in the ``friction`` field
+            of channel components.
+        base:
+          type: string
+          title: Built-in correlation to use as base
+          enum: [blasius, katheder, central_spiral]
+          description: |
+            Required only for Case 2: built-in correlation with custom parameters.
+            Identifies which built-in initialization to use for this entry.
+        alpha:
+          $ref: '#/$defs/numeric_value'
+          title: Friction coefficient alpha
+        beta:
+          $ref: '#/$defs/numeric_value'
+          title: Friction coefficient beta
+        VoidFr:
+          $ref: '#/$defs/numeric_value'
+          title: Void fraction (katheder only)
+        Re_min:
+          $ref: '#/$defs/numeric_value'
+          title: Minimum Reynolds number for Katheder activation (katheder only, default 1000)
+          description: |
+            Reynolds number threshold below which the Katheder correlation returns zero
+            and only laminar friction applies (default: 1000). Set to 0 to activate
+            Katheder for all Re > 0.
+    description: |
+      Optional list of named friction correlations available to channel components.
+      Three use cases are supported: built-in with defaults, built-in with custom
+      parameters, or user-defined via external DLL.
+      See :ref:`friction-correlations-details` for details and examples.
+
+  nusselt_correlations:
+    title: Nusselt number correlations
+    type: array
+    items:
+      type: object
+      required: [nusselt]
+      properties:
+        nusselt:
+          type: string
+          title: Correlation name
+          description: |
+            Unique name used to reference this correlation in the ``nusselt`` field
+            of channel, fluidlink and thermalink components.
+        base:
+          type: string
+          title: Built-in correlation to use as base
+          enum: [pipe, DBG]
+          description: |
+            Required only for Case 2: built-in correlation with custom parameters.
+            Identifies which built-in initialization to use for this entry.
+        a:
+          $ref: '#/$defs/numeric_value'
+          title: Coefficient a
+        b:
+          $ref: '#/$defs/numeric_value'
+          title: Coefficient b
+        c:
+          $ref: '#/$defs/numeric_value'
+          title: Coefficient c
+        d:
+          $ref: '#/$defs/numeric_value'
+          title: Temperature ratio exponent (DBG only)          
+        NuL:
+          $ref: '#/$defs/numeric_value'
+          title: Laminar Nusselt number (DBG only)
+          description: |
+            Minimum value applied in the DBG correlation: Nu = max(NuL, NuT).
+    description: |
+      Optional list of named Nusselt number correlations available to channel,
+      fluidlink and thermalink components. Three use cases are supported:
+      built-in with defaults, built-in with custom parameters, or user-defined
+      via external DLL. See :ref:`nusselt-correlations-details` for details and examples.
+
+  materials:
+    title: Material database
+    type: array
+    items:
+      type: object
+      required: [material]
+      properties:
+        material:
+          type: string
+        base:
+          type: string
+          enum: [copper, nb3sn, nbti, stainless_steel, glass_epoxy, glass_kapton_glass]
+        density:
+          $ref: '#/$defs/numeric_value'
+        RRR:
+          $ref: '#/$defs/numeric_value'
+        E0:
+          $ref: '#/$defs/numeric_value'
+        nPow:
+          $ref: '#/$defs/numeric_value'
+        Bc20m:
+          $ref: '#/$defs/numeric_value'
+        Tc0m:
+          $ref: '#/$defs/numeric_value'
+        nu:
+          $ref: '#/$defs/numeric_value'
+        Ca1:
+          $ref: '#/$defs/numeric_value'
+        Ca2:
+          $ref: '#/$defs/numeric_value'
+        e0a:
+          $ref: '#/$defs/numeric_value'
+        emax:
+          $ref: '#/$defs/numeric_value'
+        C0:
+          $ref: '#/$defs/numeric_value'
+        p:
+          $ref: '#/$defs/numeric_value'
+        q:
+          $ref: '#/$defs/numeric_value'
+        str1:
+          $ref: '#/$defs/numeric_value'
+        str2:
+          $ref: '#/$defs/numeric_value'
+        Bc20:
+          $ref: '#/$defs/numeric_value'
+        Tc0_p:
+          $ref: '#/$defs/numeric_value'
+        CC0:
+          $ref: '#/$defs/numeric_value'
+        n:
+          $ref: '#/$defs/numeric_value'
+    description: |
+      Optional list of named materials available to ``strand``, ``solid``,
+      ``solidlink``, and ``mesh2D`` components. Three use cases are supported:
+      built-in with defaults, built-in with custom parameters, or user-defined
+      via external DLL. See :ref:`materials-details` for details and examples.
+
+      Optional parameters: ``density``, ``RRR``, ``E0``, ``nPow``,
+      ``Bc20m``, ``Tc0m``, ``nu``, ``Ca1``, ``Ca2``, ``e0a``, ``emax``,
+      ``C0``, ``p``, ``q``, ``str1``, ``str2``,
+      ``Bc20``, ``Tc0_p``, ``CC0``, ``n``.
+
+  components:
+    title: List of components to describe the model
+    type: array
+    items:
+      type: object
+      required: [type]
+      oneOf:
+      - $ref: '#/$defs/channel'
+      - $ref: '#/$defs/strand'
+      - $ref: '#/$defs/solid'
+      - $ref: '#/$defs/mesh2D'
+      - $ref: '#/$defs/junction'
+      - $ref: '#/$defs/fluidlink'
+      - $ref: '#/$defs/thermalink'
+      - $ref: '#/$defs/solidlink'
+      - $ref: '#/$defs/pump'
+      - $ref: '#/$defs/compressor'
+      - $ref: '#/$defs/boundary_PT'
+      - $ref: '#/$defs/boundary_mT'
+      discriminator:
+        propertyName: type
+        mapping:
+          channel:     '#/$defs/channel'
+          strand:      '#/$defs/strand'
+          solid:       '#/$defs/solid'
+          mesh2D:      '#/$defs/mesh2D'
+          junction:    '#/$defs/junction'
+          fluidlink:   '#/$defs/fluidlink'
+          thermalink:  '#/$defs/thermalink'
+          solidlink:   '#/$defs/solidlink'
+          pump:        '#/$defs/pump'
+          compressor:  '#/$defs/compressor'
+          boundary_PT: '#/$defs/boundary_PT'
+          boundary_mT: '#/$defs/boundary_mT'
+
+$defs:   
+  channel:
+    title: channel
+    description: |
+     1D pipe filled with compressible helium
+
+      .. code:: yaml   
+
+        Example:
+          - type: channel            # Component type
+            id: pipe_3L_P1_Hol       # Component Id
+            nodes: 193               # Number of nodes
+            length: 147.66           # Total length of the pipe (m)
+            diameter: 0.007          # Diameter of the pipe (m)
+            initial: {p: 5.0e5, t: 4.3, u: 0}   # Initial conditions
+            thermal: flux            # Heat transfer with a wall expected
+            flux: 0                  # Zero flux in this specific case
+            channel_link: yes        # Expected link with another channel component
+            friction: blasius        # Friction factor correlation name
+    properties:
+      type: {const: channel}
+      id:
+        title: '"id" has to be unique and it is used by the links components'
+        type: string
+      nodes:
+        title: Number of nodes equally distanced along the channel length - Only used in case of
+         uniform mesh
+        type: integer
+      length:
+        oneOf:     
+        - title: Total length (m) of helium channel - In case of uniform mesh
+          $ref: '#/$defs/numeric_value'
+        - title: Length of each node (m) - In case of non-uniform mesh
+          $ref: '#/$defs/1D_numeric_value'
+      diameter:
+        title: Hydraulic diameter (m) - Constant value along the channel
+        $ref: '#/$defs/numeric_value'
+      area:
+        title: Cross-section area (m^2) - Constant value along the channel
+        description: |
+          To be used in case of Bundle Gap only - Otherwise,
+          the area is automatically calculated based on the diameter
+        $ref: '#/$defs/numeric_value'
+      initial:
+        properties:
+          p:
+            title: Initial pressure (Pa)
+            $ref: '#/$defs/numeric_value'
+          t:
+            title: Initial temperature (K)
+            $ref: '#/$defs/numeric_value'
+          u:
+            title: Initial speed (m/s)
+            $ref: '#/$defs/numeric_value'
+        required:
+        - p
+        - t
+        - u
+        type: object
+      thermal:
+        default: flux
+        title: Thermal boundary type of the channel
+        description: |
+          Defining a wall temperature (``temp``), a thermal flux (``flux``) or specifying a link
+          (``link``) with another component are the options available to the user - Value if nothing
+          is specified by the user: ``flux``
+        enum:
+        - temp
+        - flux
+        - link
+        type: string
+      temp:
+        title: Wall temperature (K) - To be used if temp is assigned to thermal
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/1D_signal'
+      flux:
+        title: Thermal flux (W/m) - To be used if flux is assigned to thermal
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/1D_signal'
+      channel_link:
+        $ref: '#/$defs/bool'
+        title: Hydraulic link with other channels - Mass, momentum and energy exchanges
+        default: false
+        description:    |
+          Value if nothing is specified by the user: ``false``        
+      friction:
+        title: Friction factor correlation name
+        type: string
+        description: |
+          Built-in names: ``blasius``, ``katheder``, ``central_spiral``.
+          Custom correlations can be defined in ``friction_correlations``
+          (see :ref:`top-level-configuration`).
+      nusselt:
+        title: Nusselt number correlation name
+        type: string
+        description: |
+          Used only when ``thermal: temp``.
+          Built-in names: ``pipe``, ``DBG``.
+          Custom correlations can be defined in ``nusselt_correlations``
+          (see :ref:`top-level-configuration`).
+    required: [id,length,diameter,initial,friction]
+  strand:
+    title: strand
+    description: |
+     1D composite strand that contains a superconducting material in parallel with a stabilizer
+     shunt
+
+      .. code:: yaml   
+
+        Example:
+          - type: strand               # Component type    
+            id: strand_3L_P1           # Component Id
+            nodes: 193                 # Number of nodes
+            length: 147.66             # Strand length        
+            initial: {t: 4.3}          # Initial conditions
+            CICC_inner_radius: 0.005   # CICC inner radius (m) for effective field 
+                                       # computation - Useless in this specific case
+            CICC_outer_radius: 0.0168  # CICC outer radius (m) for effective field
+                                       # computation - Useless in this specific case
+            stabilizer: 
+              material: Copper         # Stabilizer name
+              area: 308.66e-6          # Stabilizer cross-section area (m2)
+            superconductor: 
+              material: Nb3Sn_JAS      # Superconductor name
+              area: 154.33e-6          # Superconductor cross-section area (m2)
+            channel_link: yes          # Thermal contact expected with a channel component
+            flux:                      # Thermal flux imposed from h5 data
+              time:  {h5: Q_CS3L_1.h5, data: t} # Time (s) scenario
+              x:     {h5: Q_CS3L_1.h5, data: x} # Space (m) scenario
+              value: {h5: Q_CS3L_1.h5, data: d} # Flux in W/m (structure of the data
+                                       # consistent with imposed time/space scenario)
+              order:  1                # 1st order interpolation in time
+              repeat: 0                # No scenario repeat
+              event:  no               # No intervention on the time step management
+            field: 0.0                 # No magnetic field (T)
+            field_gradient: 0.0        # No magnetic field gradient (T/m)
+            current: 0.0               # No current (A)
+    properties:
+      type: {const: strand}
+      id:
+        title: '''id'' has to be unique and it is used for connections'
+        type: string
+      nodes:
+        title: Number of nodes equally distanced along the channel length - Only used in case of
+         uniform mesh
+        type: integer
+      length:
+        oneOf:     
+        - title: Total length (m) of helium channel - In case of uniform mesh
+          $ref: '#/$defs/numeric_value'
+        - title: Length of each node (m) - In case of non-uniform mesh
+          $ref: '#/$defs/1D_numeric_value'
+      initial:
+        properties:
+          t:
+            title: Initial temperature (K)
+            $ref: '#/$defs/numeric_value'
+        required:
+        - t
+        type: object
+      CICC_inner_radius:
+        title: CICC inner radius (m)
+        $ref: '#/$defs/numeric_value'
+      CICC_outer_radius:
+        title: CICC outer radius (m)
+        $ref: '#/$defs/numeric_value'
+      stabilizer:
+        properties:
+          material:
+            title: Material name
+            type: string
+            description: |
+              Built-in name for stabilizer: ``copper``
+              Custom materials can be defined in ``materials`` (see :ref:`top-level-configuration`).
+          area:
+            title: Cross-section area (m^2)
+            $ref: '#/$defs/numeric_value'
+        required:
+        - material
+        - area
+        - RRR
+        type: object
+      superconductor:
+        properties:
+          material:
+            title: Material name
+            type: string
+            description: |
+              Built-in names for superconductor: ``nb3sn``, ``nbti``.
+              Custom materials can be defined in ``materials`` (see :ref:`top-level-configuration`).
+          area:
+            title: Cross-section area (m^2)
+            $ref: '#/$defs/numeric_value'
+        required:
+        - material
+        - area
+        - E0
+        - nPow
+        type: object        
+      channel_link:
+        $ref: '#/$defs/bool'
+        title: Thermal link with hydraulic channel
+      flux:
+        title: Heat load applied to strand component (W/m) - Can be a single value OR based on time
+         interpolation OR time/space one
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/1D_signal'
+      field:
+        title: Magnetic field map (T) of the specific strand - Can be a single value OR based on time
+         interpolation OR time/space one
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/1D_signal'
+      field_gradient:
+        title: Magnetic field gradient map (T/m) of the specific strand - Can be a single value OR based
+         on time interpolation OR time/space one
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/1D_signal'
+      current:
+        title: Electric current (A) - Can be a single value OR based on time interpolation
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/0D_signal'
+    required: [id,length,initial,CICC_inner_radius,CICC_outer_radius,stabilizer,superconductor,
+                channel_link,flux,field,field_gradient,current]
+  solid:
+    title: solid
+    description: |
+     The lumped mass approach is used to define the part of the structure in contact with CICCs -
+     A solid component is an array of solid chunks, each carrying its own temperature
+
+      .. code:: yaml   
+
+        Example:
+          - type: solid                         # Component type
+            id: chunk_3L_P1                     # Component Id
+            length: [1.02,1.03, 1.03, 1.04]     # Length of each solid chunk along the
+                                                # CICC trajectory
+            volume: [1.48,1.49, 1.49, 1.50]     # Volume of each solid chunk
+            initial: {t: 4.3}                   # Initial temperature
+            material: stainless_steel           # Solid material
+            channel_link: [yes, yes, yes, yes]  # Thermal link with a channel
+                                            # component expected for each solid chunk
+            solid_link: yes                 # Thermal link with other solid
+                                            # components expected
+            flux: 100.0                     # Uniform heat load of 100 W/m (optional)
+    properties:
+      type: {const: solid}
+      id:
+        title: '''id'' has to be unique and it is used for connections'
+        type: string
+      length:
+        title: Length (m) of each metal chunk along the CICC trajectory
+        $ref: '#/$defs/1D_numeric_value'        
+      volume:
+        title: Volume (m^3) of each metal chunk
+        description: |
+          A single scalar can be provided instead of a list: REIMS will fill the array with
+          that value repeated for every node.
+        $ref: '#/$defs/1D_numeric_value'
+      initial:
+        properties:
+          t:
+            title: Initial temperature (K)
+            $ref: '#/$defs/numeric_value'
+        required:
+        - t
+        type: object
+      conduction_between_nodes:
+        $ref: '#/$defs/bool'
+        title: Thermal conduction between metal chunks along the CICC trajectory
+      material:
+        title: Material name
+        type: string
+        description: |
+          Built-in names: ``copper``, ``nb3sn``, ``nbti``, ``stainless_steel``,
+          ``glass_epoxy``, ``glass_kapton_glass``.
+          Custom materials can be defined in ``materials`` (see :ref:`top-level-configuration`).
+      channel_link:
+        $ref: '#/$defs/1D_bool'
+        title: Thermal link with hydraulic channel per metal chunk
+      solid_link:
+        $ref: '#/$defs/bool'
+        title: Thermal link with other solid
+      flux:
+        title: External heat load (W/m) applied to solid component - Can be a single value OR based
+         on time interpolation OR time/space one
+        oneOf:
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/1D_signal'
+    required: [id,length,volume,initial,conduction_between_nodes,material,stabilizer,channel_link,solid_link,flux]
+  mesh2D:
+    title: mesh2D
+    description: |
+      2D surface representing a slice of a 3D solid structure - Available for heat diffusion
+      treatment
+
+      .. note::
+
+        **Gmsh mesh ordering requirements (current code limitation)**
+
+        In the ``.geo`` file, all geometric entities (points, lines, surfaces) must be defined
+        **before** any physical group. Among physical groups, **physical lines must appear before
+        physical surfaces**. Failing to respect this order will cause element labels to be
+        misassigned at runtime. This constraint is due to the current implementation of the mesh
+        reader and may be removed in a future version.
+
+      .. code:: yaml   
+
+        Example:
+          - type: mesh2D                   # Component type
+            id: slice00                    # Component Id
+            mesh: meshing/sliceXY_00.msh   # Reference mesh file
+            initial: {t: 4.3}              # Initial temperature imposed in all the geometry
+            regions:                       # Introduces the list of labels that identify specific 2D
+                                           # regions of the 2D geometry
+              - label: SS                  # Label name
+                material: stainless_steel  # Material name used in this specific region
+                source:                    # Heat load scenario to be specified
+                  time:  {h5: Qcase_00.h5, data: t}  # Time scenario (s)
+                  value: {h5: Qcase_00.h5, data: d}  # Heat load scenario consistent with the
+                                           # time array (W/m)
+            edges:                         # Introduces the list of labels that identify specific 1D
+                                           # boundaries of the 2D geometry
+              - {label: BC_bound,   type: flux,  value: 0.0}  # No heat flux to the 1D boundary
+                                           # identified by the label BC_bound
+            channel_link:
+              - OP_Sl00_Hole02             # label that is expected to be thermally connected
+                                           # to a channel component
+              - OP_Sl00_Hole01             # label that is expected to be thermally connected
+                                           # to a channel component
+            solid_link:
+              - P00_Tur02_Sl00             # label that is expected to be thermally connected
+                                           # to a solid component
+    properties:
+      type: {const: mesh2D}
+      id:
+        title: '''id'' has to be unique and it is used for connections'
+        type: string
+      mesh:
+        title: Mesh file specification with name and path defining the geometry location
+        type: string   
+      extrusion_length:
+        $ref: '#/$defs/numeric_value'
+        title: Extrusion length of the 2D slice (m)
+        default: 1.062
+        description: |
+          Value if nothing is specified by the user: ``1.062``        
+      initial:
+        properties:
+          t:
+            title: Initial temperature (K)
+            $ref: '#/$defs/numeric_value'
+        required:
+        - t
+        type: object
+      regions:
+        properties:
+          label:
+            title: Name of the label that identifies a specific 2D region of the 2D geometry
+            description: |
+              This label must exist in the .msh file generated by Gmsh software from a .geo file that
+              describes the 2D geometry and introduces such labels
+            type: string
+          material:
+            title: Material name
+            type: string
+            description: |
+              Built-in names: ``copper``, ``nb3sn``, ``nbti``, ``stainless_steel``,
+              ``glass_epoxy``, ``glass_kapton_glass``.
+              Custom materials can be defined in ``materials`` (see :ref:`top-level-configuration`).
+          source: 
+            title: Heat load applied (W) to the region identified by the label
+            oneOf:  
+            - $ref: '#/$defs/numeric_value'
+            - $ref: '#/$defs/0D_signal'
+        required:     
+        - label
+        - material
+        - source                 
+        type: object            
+      edges:
+        properties:
+          label:
+            title: Name of the label that identifies a specific 1D boundary of the 2D geometry
+            description: |
+              This label must exist in the .msh file generated by Gmsh software from a .geo file
+              that describes the 2D geometry and introduces such labels
+            type: string
+          type:
+            title: The user can specify either a temperature or a thermal flux at the level of the
+             considered 1D slice boundary
+            enum:
+            - temp
+            - flux
+            type: string     
+          value: 
+            title: Imposed temperature (K) of thermal flux (W) depending on the type of the thermal
+             boundary condition
+            oneOf:  
+            - $ref: '#/$defs/numeric_value'
+            - $ref: '#/$defs/0D_signal'            
+        required:     
+        - label
+        - type
+        - value    
+        type: object
+      channel_link:
+        title: List of labels dedicated to thermal contact with hydraulic channel - If they exist
+        $ref: '#/$defs/1D_string'
+      solid_link:
+        title: List of labels dedicated to thermal contact with solid components - If they exist
+        $ref: '#/$defs/1D_string'
+    required: [id,mesh,initial,regions,edges]
+  junction:
+    title: junction
+    description: |
+      A junction connects 1D helium channels together
+
+      .. code:: yaml   
+
+        Example:      
+          - type: junction  # Component type
+            link:           # Several branches expected - In this specific configuration,
+                            # outlet of pipe1 is connected to inlets of both pipe2 and pipe3
+            - id: pipe1     # Channel id
+              node: out     # Involved channel boundary
+              kappa: 1      # Kappa=1 means no pressure loss increase at the junction
+            - id: pipe2
+              node: in
+              angle:  90    # Angle between the reference pipe1 and the present branch
+            - {id: pipe3,   node: in,   angle:  90}
+    properties:
+      type: {const: junction}
+      link:
+        description: A junction can link several branches together (not limited number)
+        type: array
+        items:        
+          $ref: '#/$defs/junction_link_type'
+    required: link
+  junction_link_type:
+    type: object
+    properties:
+      id:
+        title: Identification of one of the branches involved in the junction - 
+        description: '''id'' of the corresponding channel component is required'
+        type: string
+      node:
+        title: Specification of the channel boundary connected to the junction
+        description: It can be ``in`` for inlet or ``out`` for outlet
+        type: string    
+      kappa: 
+        title: Correction of the pressure loss coefficient via the introduction of the factor ''kappa''
+        default: 1.0
+        description: |              
+          Value if nothing is specified by the user: ``1.0`` (no pressure loss increase)
+
+          If ''kappa'' is specified by the user, it must only be defined on the first item (the 1st
+          branch is automatically referred as the reference one for this specific junction)
+        $ref: '#/$defs/numeric_value'
+      angle: 
+        title: Angle (degrees) between the reference branch (1st item) and the branch associated to
+         the current item
+        default: 0.0
+        description: |
+          Only define it from the second item
+
+          Value if nothing is specified by the user: ``0.0`` degree
+        $ref: '#/$defs/numeric_value'
+    required:     
+    - id
+    - node
+  fluidlink:
+    title: fluidlink
+    description: |
+     Fluid-FLuid link that connects one helium channel to another - Transverse mass, momentum and
+     energy exchanges are allowed
+
+      .. code:: yaml   
+
+        Example:      
+          - type: fluidlink                  # Component type
+            wetted_perim_channels: 31.42e-3  # Wetted perimeter delimiting the boundary
+                                             # between the channels (m)
+            link:  # Two channels must be identified - In this specific configuration,  
+                   # the cells 1 to 5 from pipeTF_Pan1_BG are connected to cells 1 to 5 
+                   # from pipeTF_Pan1_Hol
+            - id: pipeTF_Pan1_BG    # Channel Id
+              node: [1, 2, 3, 4, 5] # Channel involved nodes
+            - {id: pipeTF_Pan1_Hol, node: [1, 2, 3, 4, 5]}  # Id + involved nodes are
+                                                            # specified for this channel
+    properties:
+      type: {const: fluidlink}
+      wetted_perim_channels:
+        title: Wetted perimeter delimiting the boundary between the channels (m)
+        $ref: '#/$defs/numeric_value'
+      nusselt:
+        title: Nusselt number correlation name
+        type: string
+        description: |
+          Built-in names: ``pipe``, ``DBG``.
+          Custom correlations can be defined in ``nusselt_correlations``
+          (see :ref:`top-level-configuration`).
+      link:
+        description: Two channels must be identified
+        type: array
+        items:
+          $ref: '#/$defs/fluidlink_link_type'
+    required: [wetted_perim_channels,link,nusselt]        
+  fluidlink_link_type:
+    type: object
+    properties:
+      id:
+        title: Identification of one of the channels involved
+        description: '''id'' of the corresponding channel component is required'
+        type: string
+      node:
+        title: List of cell indexes that are connected to cells of the other channel component
+        description: |
+          The lists of the two items must be the same size - The i-th element of the
+          item 1 list will be connected to the i-th element of the item 2 list
+        $ref: '#/$defs/1D_integer'
+    required:     
+    - id
+    - node  
+  thermalink:
+    title: thermalink
+    description: |
+      Fluid-Solid link that thermally connects one helium channel to one of the following components
+      (strand, solid or mesh2D)
+
+      .. code:: yaml   
+
+        Example:
+          - type: thermalink              # Component type
+              contact_surface: [0.067, 0.067, 0.067, 0.067, 0.068, 0.068]  # Contact surfaces
+                                          # in (m2) for each of the 6 contacts
+              link:                       # One channel and one solid component are specified
+                                          # in this specific configuration
+              - id: pipeTF_Pan1_BG        # Id + involved nodes are specified for this channel
+                node: [1, 2, 3, 4, 5, 6]  
+              - id: MC_TF_Pan1_C          # Id + involved nodes are specified for this solid
+                node: [1, 2, 3, 4, 5, 6]
+                distance: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01] # distances per chunk
+                                          # used for the computation of the temperature
+                                          # gradient within the considered chunk
+    properties:
+      type: {const: thermalink}
+      wetted_perimeter:
+        title: Wetted perimeter of the channel in contact with the strand (m)
+        description: Link channel/strand only - Required for this specific configuration
+        $ref: '#/$defs/numeric_value'
+      contact_surface:
+        title: List of contact surfaces (m2)
+        description: |
+          Link channel/solid only - Required for this specific configuration - Each element represents
+          a contact between a given channel cell and its associated solid chunk.
+          A single scalar can be provided instead of a list: REIMS will fill the array with
+          that value repeated for every node.
+        $ref: '#/$defs/1D_numeric_value'
+      heat_coefficient:
+        title: Imposed heat transfer coefficient (W/m2/K)
+        description: Link channel/mesh2D only - Required for this specific configuration
+        $ref: '#/$defs/numeric_value'
+      nusselt:
+        title: Nusselt number correlation name
+        type: string
+        description: |
+          Required for channel/strand and channel/solid configurations.
+          Built-in names: ``pipe``, ``DBG``.
+          Custom correlations can be defined in ``nusselt_correlations``
+          (see :ref:`top-level-configuration`).
+      link:
+        description: |
+          One channel and one of the following components (strand, solid or mesh2D) must be
+          identified - The channel component is always the first item
+        type: array
+        items:
+          $ref: '#/$defs/thermalink_link_type'     
+    required:     
+    - link            
+  thermalink_link_type:
+    type: object
+    properties:
+      id:
+        title: Identification of one of the components involved
+        description: '''id'' of the corresponding component is required'
+        type: string
+      node:
+        title: List of cell indexes that are connected to cells of the other component
+        description: |
+          To be used if the item corresponds to one of the following components (channel, strand or
+          solid) - The lists of the two items must be the same size - The i-th element of the item 1
+          list will be connected to the i-th element of the item 2 list
+        $ref: '#/$defs/1D_integer'
+      label:
+        title: List of labels that are connected to cells of the channel component
+        description: |
+          Must be used instead of ''node'' if the item corresponds to the mesh2D component.
+          The lists of the two items must be the same size - The i-th element of the item 1 (channel)
+          list will be connected to the i-th element of the item 2 (mesh2D) list
+        $ref: '#/$defs/1D_string'                
+      distance:
+        title: List of distances (m) used for the computation of the temperature gradient within the
+          solid chunks defining the solid component
+        description: |
+          Link channel/solid only - Required for this specific configuration - Property only defined
+          in the item dedicated to the solid component - Each element of the list represents the
+          distance involved in the computation of the temperature gradient within the associated
+          solid chunk - The list of distances and the list of nodes must be the same size.
+          A single scalar can be provided instead of a list: REIMS will fill the array with
+          that value repeated for every node.
+        $ref: '#/$defs/1D_numeric_value'
+    required:
+    - id
+  solidlink:  
+    title: solidlink
+    description: |
+     Solid-Solid link that thermally connects a solid component with another, or a solid component
+     with a mesh2D slice.
+
+      .. code:: yaml   
+
+        Example:
+          - type: solidlink         # Component type
+            material: glass_epoxy   # Insulation material name
+            thickness: [0.0]        # Zero thickness in this example,
+                                    # meaning that the current thermal contact is full
+            link:
+            - id: MC_TF_Pan4_R      # Id + involved node are specified for this solid
+              node: [5]               
+              distance: [2.430e-03] # distance used for the computation of the temperature gradient
+                                    # within the considered chunk
+            - id: slice00
+              label: [P00_Tur02_Sl00] # Id + label involved for this mesh2D component
+    properties:
+      type: {const: solidlink}
+      contact_surface:
+        title: List of contact surfaces (m2)
+        description: |
+          Link solid/solid only - Required for this specific configuration - Each element represents
+          a contact between a given solid chunk and its associated one.
+          A single scalar can be provided instead of a list: REIMS will fill the array with
+          that value repeated for every node.
+        $ref: '#/$defs/1D_numeric_value'
+      material:
+        title: Insulation material name
+        type: string
+        description: |
+          Name of the material used in case of thermal resistance consideration for this
+          specific Solid-Solid link.
+          Built-in names: ``glass_epoxy``, ``glass_kapton_glass``.
+          Custom materials can be defined in ``materials`` (see :ref:`top-level-configuration`).
+      thickness:
+        title: List of insulation thicknesses (m)
+        description: |
+          Each element represents a contact between a given solid chunk and its associated solid
+          chunk or label (in case of a mesh2D component) - A non-zero thickness of insulation for a
+          given contact is required in case of thermal resistance consideration -
+          Put 0.0 for a given contact if full thermal contact is expected.
+          A single scalar can be provided instead of a list: REIMS will fill the array with
+          that value repeated for every node.
+        $ref: '#/$defs/1D_numeric_value'
+      link:
+        description: |
+          One solid component and one of the following components (solid or mesh2D) must be 
+          identified - The mesh2D component (if present) is always the second item
+        type: array
+        items:        
+          $ref: '#/$defs/solidlink_link_type'
+    required:     
+    - material 
+    - thickness
+    - link            
+  solidlink_link_type:
+    type: object
+    properties:   
+      id:
+        title: Identification of one of the components involved
+        description: '''id'' of the corresponding component is required'
+        type: string
+      node:
+        title: List of solid chunk indexes that are connected to solid chunks or labels of the other
+          component, depending on its type
+        description: |
+          To be used if the item corresponds to a solid component - 
+          The lists of the two items must be the same size - The i-th element of the item 1 list will
+          be connected to the i-th element of the item 2 list
+        $ref: '#/$defs/1D_integer'          
+      label:
+        title: List of labels that are connected to solid chunks of the solid component
+        description: |
+          Must be used instead of ''node'' if the item corresponds to the mesh2D component.
+          The lists of the two items must be the same size - The i-th element of the item 1 (solid)
+          list will be connected to the i-th element of the item 2 (mesh2D) list
+        $ref: '#/$defs/1D_string'   
+      distance:
+        title: List of distances (m) used for the computation of the temperature gradient within the
+          solid chunks defining the solid component
+        description: |
+          Property only defined for the item dedicated to a solid component - Each element of the
+          list represents the distance involved in the computation of the temperature gradient
+          within the associated solid chunk - The list of distances and the list of nodes must be
+          the same size.
+          A single scalar can be provided instead of a list: REIMS will fill the array with
+          that value repeated for every node.
+        $ref: '#/$defs/1D_numeric_value'
+  pump:
+    title: pump
+    description: |
+     A pump connects two 1D helium channels together
+
+      .. code:: yaml   
+
+        Example:    
+          - type: pump    # Component type
+            m0: 1e-3      # Mass flow rate: 1 g/s
+            link:         # 2 links: link 1 - pump inlet, link 2 - pump outlet
+             - id: pipe   # inlet of the pump connected to outlet of 'pipe'
+               node: out  # outlet pipe
+             - id: pipe   # outlet of the pump connected to inlet of 'pipe'
+               node: in   # inlet pipe         
+    properties:
+      type: {const: pump}
+      m0:
+        title: Pump-imposed mass flow rate (kg/s)
+        $ref: '#/$defs/numeric_value'        
+      link:
+        description: |
+          Two channels must be identified - The outlet of one channel component (1st link) must be
+          connected to the inlet of the other
+        type: array
+        items:        
+          $ref: '#/$defs/circulator_link_type'
+    required: [m0,link]        
+  compressor:
+    title: compressor
+    description: |
+     A compressor connects two 1D helium channels together
+
+      .. code:: yaml   
+
+        Example:    
+          - type: compressor    # Component type
+            m0:  0.002          # Mass flow rate parameter (kg/s)
+            dp0: 3.3e5          # Pressure parameter (Pa)
+            link:               # 2 links: link 1 - pump inlet, link 2 - pump outlet
+             - id: pipe         # inlet of the pump connected to outlet of 'pipe'
+               node: out        # outlet pipe
+             - id: pipe         # outlet of the pump connected to inlet of 'pipe'
+               node: in         # inlet pipe       
+    properties:
+      type: {const: compressor}
+      m0:
+        title: Mass flow rate parameter (kg/s) involved in the compressor characteristic definition
+        $ref: '#/$defs/numeric_value'     
+      dp0:
+        title: Pressure parameter (Pa) involved in the compressor characteristic definition
+        $ref: '#/$defs/numeric_value'        
+      link:
+        description: |
+          Two channels must be identified - The outlet of one channel component (1st link) must be
+          connected to the inlet of the other
+        type: array
+        items:        
+          $ref: '#/$defs/circulator_link_type'
+    required: [m0,dp0,link]        
+  circulator_link_type:
+    type: object
+    properties:
+      id:
+        title: Identification of one of the branches connected to the circulator
+        description: '''id'' of the corresponding channel component is required'
+        type: string
+      node:
+        title: Specification of the channel boundary connected to the circulator
+        description: |
+          It can be ``in`` for inlet or ``out`` for outlet - However, the node of the 1st link must
+          be ``out``
+        type: string    
+    required:     
+    - id
+    - node
+  boundary_PT:
+    title: boundary_PT
+    description: |
+      Helium tank with imposed pressure and temperature acting as an inflow boundary condition - 
+      This inflow may become an outflow under certain circumstances
+
+      .. code:: yaml   
+
+        Example:  
+          - type: boundary_PT            # Component type
+            p: 2.0e5                     # Tank pressure (Pa)
+            t: 293.0                     # Tank temperature (K)
+            link:  {id: pipe, node: in}  # Id + involved boundary are specified for this channel
+    properties:
+      type: {const: boundary_PT}
+      p:
+        title: Imposed pressure (Pa)
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/0D_signal'    
+      t:
+        title: Imposed temperature (K)
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/0D_signal'        
+      link:
+        type: object
+        properties:
+          id:
+            title: Identification of the channel component for which the boundary condition is defined
+            description: '''id'' of the corresponding channel component is required'
+            type: string
+          node:
+            title: Specification of the involved channel boundary
+            description: It can be ``in`` for inlet or ``out`` for outlet
+            type: string           
+        required:
+        - id
+        - node
+      hugoniot_boundary:
+        $ref: '#/$defs/bool'
+        default: no
+        title: Exact Rankine-Hugoniot relations at this boundary
+        description: |
+          Value if nothing is specified by the user: ``no``
+
+          - ``yes``: Enforces conservation of mass, momentum and energy across the
+            pressure wave at the boundary (exact Rankine-Hugoniot relations).
+            Recommended for high-amplitude pressure transients (shocks, sudden
+            pressure ramps).
+
+          - ``no``: Acoustic (linearized) approximation. Valid for low-amplitude
+            pressure transients.
+    required: [p,t,link]
+  boundary_mT:
+    title: boundary_mT
+    description: |
+      Helium inflow boundary condition with imposed mass flow rate and temperature
+
+      .. code:: yaml   
+
+        Example:  
+          - type: boundary_mT            # Component type
+            mdot: 2.0e-3                 # Imposed mass flow rate (kg/s)
+            t: 293.0                     # Imposed temperature (K)
+            link:  {id: pipe, node: in}  # Id + involved boundary are specified for this channel      
+    properties:
+      type: {const: boundary_mT}
+      mdot:
+        title: Imposed mass flow rate (kg/s)
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/0D_signal'    
+      t:
+        title: Imposed temperature (K)
+        oneOf:  
+        - $ref: '#/$defs/numeric_value'
+        - $ref: '#/$defs/0D_signal'        
+      link:
+        type: object
+        properties:
+          id:
+            title: Identification of the channel component for which the boundary condition is defined
+            description: '''id'' of the corresponding channel component is required'
+            type: string
+          node:
+            title: Specification of the involved channel boundary
+            description: It can be ``in`` for inlet or ``out`` for outlet
+            type: string           
+        required:     
+        - id
+        - node
+    required: [mdot,t,link]
+  1D_signal:
+    description: |
+      .. code:: yaml
+
+        Example:
+          flux:                          # Heat load
+            time:  [   0,  100]          # Time scenario (s)     - 2 instants
+            x:     [ 0.0,  5.0,  10.0]   # Spatial positions (m) - 3 points
+            value: [[0.1,  0.2],         # x=0.0m : value at t=0, t=100
+                    [0.3,  0.5],         # x=5.0m : value at t=0, t=100
+                    [0.2,  0.3]]         # x=10.0m: value at t=0, t=100
+                                         # value dimension is [n_x=3 x n_time=2]
+            order:  0                    # 0 order in time
+            repeat: 0                    # No scenario repeat
+            event:  implicit             # 3 consecutive explicit steps are enforced each time the simulation
+                                         # physical time reaches one of the values specified in 'time'
+
+        Example (in case of an external DLL):
+          flux:
+            external: my_signal_func  # Function name exported by the DLL
+            my_param: 1.0             # Any extra parameters passed to the DLL at init
+    type: object
+    properties:
+      external:
+        title: Function name exported by a DLL
+        description: |
+          When ``external`` is present (the DLL must be declared in ``external_libs``),
+          ``time``, ``x`` and ``value`` are not required.
+          The additional parameters defined in the same block as ``external`` are passed to the DLL
+          at startup. See the `DLL developer guide <../../../dll/_build/html/index.html>`_ for the required interface.
+        type: string
+      time:
+        title: Time (s)
+        $ref: '#/$defs/1D_numeric_value'
+      x:
+        title: Position (m)
+        $ref: '#/$defs/1D_numeric_value'
+      value:
+        title: Corresponding value
+        $ref: '#/$defs/2D_numeric_value'
+      order:
+        title: Time interpolation order (0 or 1)
+        description:    |
+          Value if nothing is specified by the user: ``0``
+        type: integer
+      repeat:
+        title: Index from which the signal will be repeated
+        default: 0
+        description:    |
+          Value if nothing is specified by the user: ``0``
+        type: integer
+      event:
+        title: Event consideration based on Time data.
+        default: no
+        description: |
+           It can be
+
+               - ``'no'`` (value if nothing is specified by the user) if the user does not want to
+                 take care of specific events based on the 'time' data (the time step automatically
+                 evolves without intervention),
+               - ``'explicit'``: 3 consecutive explicit steps are enforced each time the simulation
+                 physical time reaches one of the values specified in 'time',
+               - ``'implicit'``: 1 implicit step is enforced each time the simulation physical time
+                 reaches one of the values specified in 'time'.
+        type: string
+    required: [time,x,value]
+  0D_signal:
+    description: |
+      .. code:: yaml
+
+        Example:
+          p:                          # Pressure
+            time:   [     0,	   100] # Time scenario (s)
+            value:  [500000,	600000] # Value (Pa)
+            order:  1                 # 1st order in time activated
+            repeat: 0                 # No scenario repeat
+            event:  no                # No intervention on the time step management
+
+        Example (in case of an external DLL):
+          p:
+            external: my_signal_func  # Function name exported by the DLL
+            my_param: 1.0             # Any extra parameters passed to the DLL at init
+    type: object
+    properties:
+      external:
+        title: Function name exported by a DLL
+        description: |
+          When ``external`` is present (the DLL must be declared in ``external_libs``),
+          ``time`` and ``value`` are not required.
+          The additional parameters defined in the same block as ``external`` are passed to the DLL
+          at startup. See the `DLL developer guide <../../../dll/_build/html/index.html>`_ for the required interface.
+        type: string
+      time:
+        title: Time (s)
+        $ref: '#/$defs/1D_numeric_value'
+      value:
+        title: Corresponding value
+        $ref: '#/$defs/1D_numeric_value'
+      order:
+        title: Time interpolation order (0 or 1)
+        default: 0
+        description:    |
+          Value if nothing is specified by the user: ``0``
+        type: integer
+      repeat:
+        title: Index from which the signal will be repeated
+        default: 0
+        description:    |
+          Value if nothing is specified by the user: ``0``
+        type: integer
+      event:
+        title: Event consideration based on Time data.
+        default: no
+        description: |
+           It can be
+
+               - ``'no'`` (value if nothing is specified by the user) if the user does not want to
+                 take care of specific events based on the 'time' data (the time step automatically
+                 evolves without intervention),
+               - ``'explicit'``: 3 consecutive explicit steps are enforced each time the simulation
+                 physical time reaches one of the values specified in 'time',
+               - ``'implicit'``: 1 implicit step is enforced each time the simulation physical time
+                 reaches one of the values specified in 'time'.
+        type: string
+    required: [time,value]
+  h5:
+    type: object
+    required: [h5,data]
+    properties:
+      data:
+        default: group/dataset
+        title: Dataset with table
+        type: string
+      h5:
+        default: file.h5
+        title: Input hdf5 file
+        type: string    
+  2D_numeric_value:
+    examples: ["[[0.0,0.0],[0.0,0.0]]", {data: group/dataset, h5: file.h5}]
+    oneOf: [type: 2D array of numbers, $ref: '#/$defs/h5']    
+  1D_numeric_value:
+    examples: ["[0.0,0.0]", {data: group/dataset, h5: file.h5}]
+    oneOf: [type: 1D array of numbers, $ref: '#/$defs/h5']
+  numeric_value:
+    examples: [0.0, {data: group/dataset, h5: file.h5}]
+    oneOf: [type: number, $ref: '#/$defs/h5']
+  1D_string:
+    examples: "['name1','name2']"
+    type: 1D array of strings
+  1D_integer:
+    examples: "[0,0]"
+    type: 1D array of integers
+  1D_bool:
+    title: 1D Boolean array
+    enum: ['true','True','TRUE','on','On','ON','y','Y','yes','Yes','YES',
+      'false','False','FALSE','off','Off','OFF','n','N','no','No','NO']
+    examples: "['yes','no']"
+    type: 1D array of strings
+  bool:
+    title: Boolean value
+    enum: ['true','True','TRUE','on','On','ON','y','Y','yes','Yes','YES',
+      'false','False','FALSE','off','Off','OFF','n','N','no','No','NO']
+    examples: ['yes']
+    type: string    
+  b_true:
+    enum: ['true','True','TRUE','on','On','ON','y','Y','yes','Yes','YES']
+    examples: ['yes']
+    type: string
+  b_false:
+    enum: ['false','False','FALSE','off','Off','OFF','n','N','no','No','NO']
+    examples: ['no']
+    type: string    

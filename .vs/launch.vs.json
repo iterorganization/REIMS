@@ -1,0 +1,397 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "basic debug",
+      "args": [
+        "${cmake.binaryDir}/../tests/basic/cicc.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "basic release",
+      "args": [
+        "${cmake.binaryDir}/../tests/basic/cicc.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "CS Jacek debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/jacek_test/module.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "CS Jacek release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/jacek_test/module.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "TF quench Jacek debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/simple_quench/single_pancake2.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "TF quench Jacek release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/simple_quench/single_pancake2.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "PF Jacek debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_pf/configurations/jacek_test/input.yaml"
+      ],
+      "type": "default"
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "PF Jacek release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_pf/configurations/jacek_test/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "CSM2_CD debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/CSM2_cool_down/module.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "CSM2_CD release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/CSM2_cool_down/module.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "CSpanCD_VSa debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/CSM2_pancake_cool_down_VS_Andrey/CDpanVSa.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "CSpanCD_VSa release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/CSM2_pancake_cool_down_VS_Andrey/CDpanVSa.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "CSpanTEST debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/zTEST/test.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "CSpanTEST release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/zTEST/test.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "Pan_OP debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/pancake_normalOP/pancake.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "Pan_OP release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/pancake_normalOP/pancake.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "FullCS_OP debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/FullCS_normalOP/full.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "FullCS_OP release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/FullCS_normalOP/full.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "dPvsMdot debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/dPvsMdot/CSM1.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "dPvsMdot release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/dPvsMdot/CSM1.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "friction debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/zCheckFriction/test.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "friction release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_cs/configurations/zCheckFriction/test.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "Heat2DCheckTF debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/preparation/Heat_transfer_validation_against_Matlab/reims_part/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "Heat2DCheckTF release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/preparation/Heat_transfer_validation_against_Matlab/reims_part/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "AllPF debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_pf/configurations/AllPF/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "AllPF release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_pf/configurations/AllPF/input.yaml"
+      ]
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "reims.exe (src\\Debug\\reims.exe)"
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "TF_1coil debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/TF_1coil/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "TF_1coil release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/TF_1coil/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "TF_1pan debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/onePan/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "TF_1pan release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/onePan/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "testDam debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/Test/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "TestDam release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/Test/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "Non_uniformity debug",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/Non_uniformity/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "Non_uniformity release",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/Non_uniformity/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "shock_tube debug",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/shock_tube/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "shock_tube release",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/shock_tube/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "Serafina_test debug",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/Serafina_test/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "Serafina_test release",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/Serafina_test/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "check_mat debug",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/check_mat/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "check_mat release",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/check_mat/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "secondary_quench debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/secondary_quench/single_pancake.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "secondary_quench release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/secondary_quench/single_pancake.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "TestDam_2026 debug",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/TestDam/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "TestDam_2026 release",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/TestDam/input.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "TestAna_simple debug",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/Test_Ana/simplified_test.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "TestAna_simple release",
+      "args": [
+        "${cmake.binaryDir}/../../tests_reims/Test_Ana/simplified_test.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "TF CD v2.1 debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/TF_MCTF/TF_MCTF_v21.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "TF CD v2.1 release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_model_tf/configurations/TF_MCTF/TF_MCTF_v21.yaml"
+      ]
+    }
+  ]
+}
