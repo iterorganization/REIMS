@@ -3,7 +3,7 @@ add_library(MKL_SEQ INTERFACE) # Single thread
 add_library(MKL_OMP INTERFACE) # Multithread OpenMP
 add_library(MKL_TBB INTERFACE) # Multithread Thread Building Blocks
 message(STATUS "ONEAPI_ROOT is set to: $ENV{ONEAPI_ROOT}")
-set(_mkl_lib "$ENV{ONEAPI_ROOT}/mkl/latest/lib/")
+set(_mkl_lib "$ENV{ONEAPI_ROOT}/mkl/latest/lib/intel64/")
 
 target_link_libraries(MKL_SEQ INTERFACE
    ${_mkl_lib}mkl_blas95_lp64.lib
@@ -42,4 +42,3 @@ target_include_directories(MKL_TBB INTERFACE
    "$ENV{ONEAPI_ROOT}/mkl/include/intel64/lp64"
    "$ENV{ONEAPI_ROOT}/mkl/include"
 )
-
