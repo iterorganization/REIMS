@@ -32,12 +32,16 @@ set(_mkl_include_dirs
 )
 
 set(_tbb_lib_dirs
+   "$ENV{TBBROOT}/lib/intel64_win"
    "$ENV{TBBROOT}/lib/intel64/vc14"
    "$ENV{TBBROOT}/lib/intel64/vc14_md"
    "$ENV{ONEAPI_ROOT}/tbb/lib/intel64_win/vc_mt"
+   "$ENV{ONEAPI_ROOT}/tbb/lib/intel64_win"
+   "${_mkl_root}/../../tbb/latest/lib/intel64_win"
    "${_mkl_root}/../../tbb/latest/lib/intel64/vc14"
    "${_mkl_root}/../../tbb/latest/lib/intel64/vc14_md"
    "${_mkl_root}/../../tbb/lib/intel64_win/vc_mt"
+   "${_mkl_root}/../../tbb/lib/intel64_win"
 )
 
 function(_reims_find_mkl_library out_var lib_name)
