@@ -46,9 +46,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-docs.txt
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
       - name: Build FORD documentation
         shell: bash
         run: |
@@ -131,6 +128,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
