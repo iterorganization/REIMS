@@ -188,29 +188,16 @@ jobs:
           $searchRoots = @(
             (Join-Path $env:ONEAPI_ROOT 'compiler/latest/bin'),
             (Join-Path $env:ONEAPI_ROOT 'compiler/latest/redist/intel64_win/compiler'),
-            (Join-Path $env:ONEAPI_ROOT 'mkl/latest/redist/intel64'),
-            (Join-Path $env:ONEAPI_ROOT 'redist/intel64_win/compiler'),
-            (Join-Path $env:ONEAPI_ROOT 'mkl/latest/bin')
+            (Join-Path $env:ONEAPI_ROOT 'redist/intel64_win/compiler')
           )
-
-          if ($env:VCToolsRedistDir) {
-            $searchRoots += $env:VCToolsRedistDir
-            $searchRoots += Join-Path $env:VCToolsRedistDir 'x64/Microsoft.VC143.CRT'
-          }
 
           $searchRoots = $searchRoots | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
 
           $runtimePatterns = @(
-            'concrt140.dll',
             'libifcoremd.dll',
-            'libifportmd.dll',
             'libiomp5md.dll',
             'libmmd.dll',
-            'mkl*.dll',
-            'msvcp140.dll',
-            'svml*.dll',
-            'vcruntime140.dll',
-            'vcruntime140_1.dll'
+            'svml_dispmd.dll'
           )
 
           foreach ($pattern in $runtimePatterns) {

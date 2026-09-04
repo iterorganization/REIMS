@@ -12,6 +12,12 @@ REIMS performs thermo-hydraulic simulation of superconducting magnets cooled by 
 
 ---
 
+- **Published documentation:** [Home](https://iterorganization.github.io/REIMS/)
+- **Published user manual:** [HTML](https://iterorganization.github.io/REIMS/user/_build/html/index.html), [PDF](https://iterorganization.github.io/REIMS/user/_build/latex/reims.pdf)
+- **Published DLL developer guide:** [HTML](https://iterorganization.github.io/REIMS/dll/_build/html/index.html), [PDF](https://iterorganization.github.io/REIMS/dll/_build/latex/reimsdlldeveloperguide.pdf)
+- **Published FORD reference:** [HTML](https://iterorganization.github.io/REIMS/ford_generated/index.html)
+- **Published JSON schema:** [JSON](https://iterorganization.github.io/REIMS/tools/reims_schema.json)
+
 - **User manual:** [PDF](docs/user/_build/latex/reims.pdf)
 - **DLL developer guide:** [PDF](docs/dll/_build/latex/reimsdlldeveloperguide.pdf)
 
