@@ -6,7 +6,9 @@
 /docs/html
 /docs/latex
 /docs/user/_*
+!/docs/user/_static/
 /docs/dll/_*
+!/docs/dll/_static/
 /build*
 /out
 *.exp
@@ -39,5 +41,8 @@ __pycache__
 
 !/.vs/launch.vs.json
 !/docs/logo/*.png
+!/docs/user/_static/*.css
 !/docs/user/_static/*.png
 !/docs/user/_static/*.mp4
+!/docs/dll/_static/*.css
+!/docs/dll/_static/*.png

@@ -1,29 +1,9 @@
 User manual
 ===========
 
-.. only:: html
-
-   .. raw:: html
-
-      <div style="display: flex; align-items: flex-start; gap: 0;">
-        <div style="position: relative; display: inline-block;">
-          <video controls autoplay loop muted
-                 style="display: block; height: 180px; width: auto;">
-            <source src="_static/cicc.mp4" type="video/mp4">
-          </video>
-          <img src="_static/TEST_CICC.png"
-               style="position: absolute; top: 0; left: 0;
-                      width: 100%; height: 100%;
-                      opacity: 0.1; pointer-events: none;">
-        </div>
-        <div>
-          <img src="_static/blue_cut.png" style="display: block; height: 180px; width: auto;">
-        </div>
-      </div>
-
-.. only:: latex
-
-   .. image:: _static/blue_cut.png
+.. image:: ../logo/blue.png
+   :alt: REIMS illustration
+   :width: 360
 
 Input file description
 ----------------------
