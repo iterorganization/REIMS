@@ -18,7 +18,7 @@ project(PROJECT_REIMS
 set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules")
 include(cmake/CPM.cmake)
 include(cmake/flags.cmake)
-find_package(OpenMP)
+find_package(OpenMP REQUIRED COMPONENTS Fortran)
 
 # Libraries and cmake configurations
 include(cmake/mkl.cmake)
