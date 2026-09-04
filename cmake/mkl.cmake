@@ -91,7 +91,8 @@ find_library(_reims_tbb_lib
    HINTS ${_tbb_lib_dirs}
    NO_DEFAULT_PATH
 )
-if(_reims_tbb_lib)
-   target_link_libraries(MKL_TBB INTERFACE "${_reims_tbb_lib}")
+if(NOT _reims_tbb_lib)
+   message(FATAL_ERROR "Could not find the required TBB import library for MKL_TBB.")
 endif()
+target_link_libraries(MKL_TBB INTERFACE "${_reims_tbb_lib}")
 target_include_directories(MKL_TBB INTERFACE ${_mkl_include_dirs})
