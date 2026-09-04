@@ -34,8 +34,10 @@ set(_mkl_include_dirs
 set(_tbb_lib_dirs
    "$ENV{TBBROOT}/lib/intel64/vc14"
    "$ENV{TBBROOT}/lib/intel64/vc14_md"
+   "$ENV{ONEAPI_ROOT}/tbb/lib/intel64_win/vc_mt"
    "${_mkl_root}/../../tbb/latest/lib/intel64/vc14"
    "${_mkl_root}/../../tbb/latest/lib/intel64/vc14_md"
+   "${_mkl_root}/../../tbb/lib/intel64_win/vc_mt"
 )
 
 function(_reims_find_mkl_library out_var lib_name)
@@ -76,9 +78,10 @@ _reims_link_mkl(MKL_OMP
    mkl_core
    mkl_intel_thread
 )
-if(TARGET OpenMP::OpenMP_Fortran)
-   target_link_libraries(MKL_OMP INTERFACE OpenMP::OpenMP_Fortran)
+if(NOT TARGET OpenMP::OpenMP_Fortran)
+   message(FATAL_ERROR "Could not find the required OpenMP::OpenMP_Fortran target for MKL_OMP.")
 endif()
+target_link_libraries(MKL_OMP INTERFACE OpenMP::OpenMP_Fortran)
 target_include_directories(MKL_OMP INTERFACE ${_mkl_include_dirs})
 
 _reims_link_mkl(MKL_TBB
