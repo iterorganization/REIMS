@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   windows-oneapi:
-    name: Windows oneAPI artifact build
+    name: Windows oneAPI release artifact build
     runs-on: windows-2022
 
     env:
@@ -21,6 +21,7 @@ jobs:
       HDF5_ARTIFACT_REPO: kosiu/hdf5-build
       ONEAPI_ROOT: C:\Program Files (x86)\Intel\oneAPI
       ONEAPI_INSTALLER_URL: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/e63ac2b4-8a9a-4768-979a-399a8b6299de/intel-oneapi-hpc-toolkit-2025.2.1.46_offline.exe
+      ONEAPI_CACHE_KEY: windows-2022-oneapi-hpc-2025.2.1.46
 
     steps:
       - name: Checkout sources
@@ -34,7 +35,15 @@ jobs:
           cmakeVersion: 4.4.0
           ninjaVersion: latest
 
+      - name: Restore Intel oneAPI cache
+        id: oneapi-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.ONEAPI_ROOT }}
+          key: ${{ env.ONEAPI_CACHE_KEY }}
+
       - name: Install Intel oneAPI HPC Toolkit
+        if: steps.oneapi-cache.outputs.cache-hit != 'true'
         shell: cmd
         run: |
           curl.exe --output "%TEMP%\webimage.exe" --url "%ONEAPI_INSTALLER_URL%" --retry 5 --retry-delay 5
@@ -43,6 +52,14 @@ jobs:
           start /b /wait "" "%TEMP%\webimage.exe" -s -x -f "%TEMP%\webimage_extracted" -l "%TEMP%\extract.log"
           if not exist "%TEMP%\webimage_extracted\bootstrapper.exe" exit /b 1
           "%TEMP%\webimage_extracted\bootstrapper.exe" -s --action install --eula=accept -p=NEED_VS2017_INTEGRATION=0 -p=NEED_VS2019_INTEGRATION=0 -p=NEED_VS2022_INTEGRATION=0 --log-dir="%TEMP%\intel-install-logs"
+
+      - name: Save Intel oneAPI cache
+        if: steps.oneapi-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.ONEAPI_ROOT }}
+          key: ${{ env.ONEAPI_CACHE_KEY }}
 
       - name: Activate Intel oneAPI environment
         shell: cmd
@@ -132,7 +149,21 @@ jobs:
             -D HDF5_ROOT="$env:HDF5_ROOT" `
             -D HDF5_DIR="$env:HDF5_DIR" `
             -D HDF5_BUILD_DIR="$env:HDF5_BUILD_DIR" `
-            -D CMAKE_PREFIX_PATH="$env:CMAKE_PREFIX_PATH"
+            -D CMAKE_PREFIX_PATH="$env:CMAKE_PREFIX_PATH" `
+            -D CMAKE_BUILD_TYPE:STRING=Release
+
+      - name: Assert configured release build
+        shell: pwsh
+        run: |
+          $cacheFile = Join-Path $env:GITHUB_WORKSPACE 'build-ninja-release/CMakeCache.txt'
+          if (-not (Test-Path $cacheFile)) {
+            throw "Expected CMake cache not found: $cacheFile"
+          }
+
+          $releaseLine = Get-Content $cacheFile | Select-String '^CMAKE_BUILD_TYPE:STRING=Release$'
+          if (-not $releaseLine) {
+            throw 'Expected CMAKE_BUILD_TYPE to be Release'
+          }
 
       - name: Build
         shell: pwsh
@@ -154,9 +185,44 @@ jobs:
           }
           Copy-Item -Path $exePath -Destination $stageDir
 
+          $searchRoots = @(
+            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/bin'),
+            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/redist/intel64_win/compiler'),
+            (Join-Path $env:ONEAPI_ROOT 'mkl/latest/redist/intel64'),
+            (Join-Path $env:ONEAPI_ROOT 'redist/intel64_win/compiler'),
+            (Join-Path $env:ONEAPI_ROOT 'mkl/latest/bin')
+          )
+
+          if ($env:VCToolsRedistDir) {
+            $searchRoots += $env:VCToolsRedistDir
+            $searchRoots += Join-Path $env:VCToolsRedistDir 'x64/Microsoft.VC143.CRT'
+          }
+
+          $searchRoots = $searchRoots | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
+
+          $runtimePatterns = @(
+            'concrt140.dll',
+            'libifcoremd.dll',
+            'libifportmd.dll',
+            'libiomp5md.dll',
+            'libmmd.dll',
+            'mkl*.dll',
+            'msvcp140.dll',
+            'svml*.dll',
+            'vcruntime140.dll',
+            'vcruntime140_1.dll'
+          )
+
+          foreach ($pattern in $runtimePatterns) {
+            Get-ChildItem -Path $searchRoots -Filter $pattern -File -Recurse -ErrorAction SilentlyContinue |
+              ForEach-Object {
+                Copy-Item -Path $_.FullName -Destination $stageDir -Force
+              }
+          }
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: reims-windows-oneapi
+          name: reims-windows-oneapi-release
           path: artifact/reims/**
           if-no-files-found: error
