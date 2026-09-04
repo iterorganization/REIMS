@@ -85,7 +85,7 @@ jobs:
       - name: Configure
         shell: pwsh
         run: |
-          cmake --preset build-VS -S . --fresh `
+          cmake --preset build-ninja-release -S . --fresh `
             -D HDF5_ROOT="$env:HDF5_ROOT" `
             -D HDF5_DIR="$env:HDF5_DIR" `
             -D HDF5_BUILD_DIR="$env:HDF5_BUILD_DIR" `
@@ -94,7 +94,7 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-          cmake --build --preset VS-Release
+          cmake --build build-ninja-release
 
       - name: Stage artifact
         shell: pwsh
@@ -105,7 +105,7 @@ jobs:
           }
           New-Item -ItemType Directory -Path $stageDir | Out-Null
 
-          $exePath = Join-Path $env:GITHUB_WORKSPACE 'build-VS/src/Release/reims.exe'
+          $exePath = Join-Path $env:GITHUB_WORKSPACE 'build-ninja-release/src/reims.exe'
           if (-not (Test-Path $exePath)) {
             throw "Expected build output not found: $exePath"
           }
