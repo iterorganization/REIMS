@@ -18,13 +18,13 @@ project(PROJECT_REIMS
 set(CMAKE_Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules")
 include(cmake/CPM.cmake)
 include(cmake/flags.cmake)
+find_package(OpenMP)
 
 # Libraries and cmake configurations
 include(cmake/mkl.cmake)
 set(HDF5_USE_STATIC_LIBRARIES ON)
 set(HDF5_REQUIRED_LIBS HDF5::HDF5 libhdf5 libhdf5_hl libhdf5_f90cstub libhdf5_fortran libhdf5_hl_f90cstub libhdf5_hl_fortran)
 find_package(HDF5 REQUIRED COMPONENTS C HL Fortran Fortran_HL)
-find_package(OpenMP)
 CPMAddPackage("gh:Nicholaswogan/fortran-yaml-c#main")
 
 # Source code
