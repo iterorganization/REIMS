@@ -77,10 +77,14 @@ jobs:
           }
 
           $hdf5Root = Split-Path (Split-Path $configFile.FullName -Parent) -Parent
+          $mklRoot = Join-Path $env:ONEAPI_ROOT 'mkl/latest'
+          $mklDir = Join-Path $mklRoot 'lib/cmake/mkl'
+          $prefixPaths = @($hdf5Root, $mklRoot) -join ';'
           "HDF5_ROOT=$hdf5Root" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "HDF5_DIR=$(Join-Path $hdf5Root 'cmake')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "HDF5_BUILD_DIR=$hdf5Root" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "CMAKE_PREFIX_PATH=$hdf5Root" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "MKL_DIR=$mklDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "CMAKE_PREFIX_PATH=$prefixPaths" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Configure
         shell: pwsh
@@ -89,6 +93,7 @@ jobs:
             -D HDF5_ROOT="$env:HDF5_ROOT" `
             -D HDF5_DIR="$env:HDF5_DIR" `
             -D HDF5_BUILD_DIR="$env:HDF5_BUILD_DIR" `
+            -D MKL_DIR="$env:MKL_DIR" `
             -D CMAKE_PREFIX_PATH="$env:CMAKE_PREFIX_PATH"
 
       - name: Build
