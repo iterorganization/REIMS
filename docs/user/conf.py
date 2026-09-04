@@ -14,6 +14,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+from pathlib import Path
+
 
 # -- Project information -----------------------------------------------------
 
@@ -54,8 +56,9 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
-html_css_files = ['custom.css']
+_static_dir = Path(__file__).parent / '_static'
+html_static_path = ['_static'] if _static_dir.is_dir() else []
+html_css_files = ['custom.css'] if (_static_dir / 'custom.css').is_file() else []
 
 # -- Options for LaTeX/PDF output --------------------------------------------
 
@@ -64,5 +67,23 @@ latex_elements = {
     'sphinxsetup': 'hmargin={2.5cm,2.5cm}, vmargin={2.5cm,2.5cm}',
     'preamble': (r'\def\_{\textunderscore\penalty0}'
                  '\n'
-                 r'\setcounter{tocdepth}{2}'),
+                 r'\setcounter{tocdepth}{2}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00D7}{\ensuremath{\times}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00B2}{\textsuperscript{2}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00B3}{\textsuperscript{3}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00B0}{\textdegree}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2013}{--}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2014}{---}'),
 }

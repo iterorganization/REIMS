@@ -1,3 +1,5 @@
+from pathlib import Path
+
 project = 'REIMS DLL Developer Guide'
 copyright = '2026, ITER Organization'
 author = 'Authors: D. Furfaro, J. Kosek'
@@ -7,14 +9,33 @@ extensions = ['sphinx.ext.autodoc']
 
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'alabaster'
-html_static_path = ['_static']
-html_css_files = ['custom.css']
+_static_dir = Path(__file__).parent / '_static'
+html_static_path = ['_static'] if _static_dir.is_dir() else []
+html_css_files = ['custom.css'] if (_static_dir / 'custom.css').is_file() else []
 
 # -- Options for LaTeX/PDF output --------------------------------------------
 
 latex_elements = {
     'papersize': 'a4paper',
     'sphinxsetup': 'hmargin={2.5cm,2.5cm}, vmargin={2.5cm,2.5cm}',
-    'preamble': r'\def\_{\textunderscore\penalty0}',
+    'preamble': (r'\def\_{\textunderscore\penalty0}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00D7}{\ensuremath{\times}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00B2}{\textsuperscript{2}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00B3}{\textsuperscript{3}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00B0}{\textdegree}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2013}{--}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2014}{---}'),
     'extraclassoptions': 'openany',
 }
