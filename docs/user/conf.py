@@ -67,5 +67,23 @@ latex_elements = {
     'sphinxsetup': 'hmargin={2.5cm,2.5cm}, vmargin={2.5cm,2.5cm}',
     'preamble': (r'\def\_{\textunderscore\penalty0}'
                  '\n'
-                 r'\setcounter{tocdepth}{2}'),
+                 r'\setcounter{tocdepth}{2}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00D7}{\ensuremath{\times}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00B2}{\textsuperscript{2}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00B3}{\textsuperscript{3}}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{00B0}{\textdegree}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2013}{--}'
+                 '\n'
+                 r'\DeclareUnicodeCharacter{2014}{---}'),
 }
