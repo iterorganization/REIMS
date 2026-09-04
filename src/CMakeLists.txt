@@ -48,7 +48,7 @@ add_executable(reims
 
 # Libraries reqired by reims
 target_link_libraries(reims
-	MKL_OMP 
+	MKL::MKL
 	OpenMP::OpenMP_Fortran
 	fortran-yaml-c
 )

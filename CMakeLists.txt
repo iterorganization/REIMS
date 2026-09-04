@@ -21,7 +21,10 @@ include(cmake/flags.cmake)
 find_package(OpenMP REQUIRED COMPONENTS Fortran)
 
 # Libraries and cmake configurations
-include(cmake/mkl.cmake)
+set(MKL_LINK static)
+set(MKL_INTERFACE lp64)
+set(MKL_THREADING intel_thread)
+find_package(MKL CONFIG REQUIRED)
 set(HDF5_USE_STATIC_LIBRARIES ON)
 set(HDF5_REQUIRED_LIBS HDF5::HDF5 libhdf5 libhdf5_hl libhdf5_f90cstub libhdf5_fortran libhdf5_hl_f90cstub libhdf5_hl_fortran)
 find_package(HDF5 REQUIRED COMPONENTS C HL Fortran Fortran_HL)
