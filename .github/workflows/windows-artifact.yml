@@ -1,0 +1,150 @@
+name: Windows Artifact
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  windows-oneapi:
+    name: Windows oneAPI artifact build
+    runs-on: windows-2022
+
+    env:
+      HDF5_ARTIFACT_NAME: hdf5-intel-static-fortran
+      HDF5_ARTIFACT_REPO: kosiu/hdf5-build
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: 4.4.0
+          ninjaVersion: latest
+
+      - name: Install Intel oneAPI compiler
+        uses: fortran-lang/setup-fortran@v1
+        with:
+          compiler: intel
+          version: '2025.2'
+
+      - name: Download latest HDF5 install artifact
+        shell: pwsh
+        env:
+          GH_TOKEN_FALLBACK: ${{ github.token }}
+          GH_TOKEN_CROSS_REPO: ${{ secrets.HDF5_BUILD_TOKEN }}
+        run: |
+          $token = if ($env:GH_TOKEN_CROSS_REPO) { $env:GH_TOKEN_CROSS_REPO } else { $env:GH_TOKEN_FALLBACK }
+          $headers = @{ 'X-GitHub-Api-Version' = '2022-11-28' }
+          if ($token) {
+            $headers.Authorization = "Bearer $token"
+          }
+
+          $artifactsUri = "https://api.github.com/repos/$env:HDF5_ARTIFACT_REPO/actions/artifacts?per_page=100"
+          $response = Invoke-RestMethod -Uri $artifactsUri -Headers $headers
+          $artifact = $response.artifacts |
+            Where-Object { $_.name -eq $env:HDF5_ARTIFACT_NAME -and -not $_.expired } |
+            Sort-Object updated_at -Descending |
+            Select-Object -First 1
+
+          if (-not $artifact) {
+            throw "Could not find a non-expired artifact named '$env:HDF5_ARTIFACT_NAME' in $env:HDF5_ARTIFACT_REPO"
+          }
+
+          $zipPath = Join-Path $env:RUNNER_TEMP 'hdf5-intel-static-fortran.zip'
+          $downloadUri = "https://api.github.com/repos/$env:HDF5_ARTIFACT_REPO/actions/artifacts/$($artifact.id)/zip"
+          Invoke-WebRequest -Uri $downloadUri -Headers $headers -OutFile $zipPath
+
+          $extractPath = Join-Path $env:RUNNER_TEMP 'hdf5-artifact'
+          if (Test-Path $extractPath) {
+            Remove-Item $extractPath -Recurse -Force
+          }
+          Expand-Archive -Path $zipPath -DestinationPath $extractPath
+
+          $configFile = Get-ChildItem -Path $extractPath -Recurse -Filter 'hdf5-config.cmake' -File | Select-Object -First 1
+          if (-not $configFile) {
+            throw 'The downloaded HDF5 artifact does not contain cmake/hdf5-config.cmake'
+          }
+
+          $hdf5Root = Split-Path (Split-Path $configFile.FullName -Parent) -Parent
+          "HDF5_ROOT=$hdf5Root" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "HDF5_DIR=$(Join-Path $hdf5Root 'cmake')" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "HDF5_BUILD_DIR=$hdf5Root" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "CMAKE_PREFIX_PATH=$hdf5Root" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake --preset build-VS -S . --fresh `
+            -D HDF5_ROOT="$env:HDF5_ROOT" `
+            -D HDF5_DIR="$env:HDF5_DIR" `
+            -D HDF5_BUILD_DIR="$env:HDF5_BUILD_DIR" `
+            -D CMAKE_PREFIX_PATH="$env:CMAKE_PREFIX_PATH"
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build --preset VS-Release
+
+      - name: Stage artifact
+        shell: pwsh
+        run: |
+          $stageDir = Join-Path $env:GITHUB_WORKSPACE 'artifact/reims'
+          if (Test-Path $stageDir) {
+            Remove-Item $stageDir -Recurse -Force
+          }
+          New-Item -ItemType Directory -Path $stageDir | Out-Null
+
+          $exePath = Join-Path $env:GITHUB_WORKSPACE 'build-VS/src/Release/reims.exe'
+          if (-not (Test-Path $exePath)) {
+            throw "Expected build output not found: $exePath"
+          }
+          Copy-Item -Path $exePath -Destination $stageDir
+
+          $runtimeDlls = @(
+            'libifcoremd.dll',
+            'libifportmd.dll',
+            'libmmd.dll',
+            'svml*.dll',
+            'libiomp5md.dll',
+            'mkl_core*.dll',
+            'mkl_intel_thread*.dll',
+            'mkl_intel_lp64*.dll',
+            'msvcp140.dll',
+            'vcruntime140.dll',
+            'vcruntime140_1.dll'
+          )
+
+          $searchRoots = @(
+            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/bin'),
+            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/bin/intel64'),
+            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/bin/compiler'),
+            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/redist/intel64_win/compiler'),
+            (Join-Path $env:ONEAPI_ROOT 'redist/intel64_win/compiler'),
+            (Join-Path $env:ONEAPI_ROOT 'mkl/latest/redist/intel64'),
+            $env:VCToolsRedistDir
+          ) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
+
+          foreach ($dll in $runtimeDlls) {
+            $match = Get-ChildItem -Path $searchRoots -Filter $dll -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($match) {
+              Copy-Item -Path $match.FullName -Destination $stageDir -Force
+            }
+          }
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reims-windows-oneapi
+          path: artifact/reims/**
+          if-no-files-found: error
