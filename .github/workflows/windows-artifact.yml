@@ -38,8 +38,10 @@ jobs:
         shell: cmd
         run: |
           curl.exe --output "%TEMP%\webimage.exe" --url "%ONEAPI_INSTALLER_URL%" --retry 5 --retry-delay 5
-          start /b /wait "" "%TEMP%\webimage.exe" -s -x -f
-          "%TEMP%\webimage_extracted" --log "%TEMP%\extract.log"
+          if exist "%TEMP%\webimage_extracted" rmdir /s /q "%TEMP%\webimage_extracted"
+          if exist "%TEMP%\intel-install-logs" rmdir /s /q "%TEMP%\intel-install-logs"
+          start /b /wait "" "%TEMP%\webimage.exe" -s -x -f "%TEMP%\webimage_extracted" -l "%TEMP%\extract.log"
+          if not exist "%TEMP%\webimage_extracted\bootstrapper.exe" exit /b 1
           "%TEMP%\webimage_extracted\bootstrapper.exe" -s --action install --eula=accept -p=NEED_VS2017_INTEGRATION=0 -p=NEED_VS2019_INTEGRATION=0 -p=NEED_VS2022_INTEGRATION=0 --log-dir="%TEMP%\intel-install-logs"
 
       - name: Activate Intel oneAPI environment
