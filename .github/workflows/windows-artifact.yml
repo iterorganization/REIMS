@@ -94,7 +94,7 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-          cmake --build --preset ninja-release
+          cmake --build build-ninja-release
 
       - name: Stage artifact
         shell: pwsh
