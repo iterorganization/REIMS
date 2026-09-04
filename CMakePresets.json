@@ -22,6 +22,7 @@
     {
       "name": "build-ninja-release",
       "generator": "Ninja",
+      "binaryDir": "${sourceDir}/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_Fortran_COMPILER": "C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifx.exe"
@@ -30,6 +31,7 @@
     {
       "name": "build-ninja-debug",
       "generator": "Ninja",
+      "binaryDir": "${sourceDir}/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_Fortran_COMPILER": "C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifx.exe"
@@ -56,6 +58,14 @@
       "name": "VS26-Release",
       "configurePreset": "build-VS26",
       "configuration": "release"
+    },
+    {
+      "name": "ninja-debug",
+      "configurePreset": "build-ninja-debug"
+    },
+    {
+      "name": "ninja-release",
+      "configurePreset": "build-ninja-release"
     }
   ]
 }

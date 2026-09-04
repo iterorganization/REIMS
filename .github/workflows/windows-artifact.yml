@@ -3,7 +3,7 @@ name: Windows Artifact
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
   workflow_dispatch:
 
@@ -94,7 +94,7 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-          cmake --build build-ninja-release
+          cmake --build --preset ninja-release
 
       - name: Stage artifact
         shell: pwsh
