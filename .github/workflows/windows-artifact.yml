@@ -19,6 +19,8 @@ jobs:
     env:
       HDF5_ARTIFACT_NAME: hdf5-intel-static-fortran
       HDF5_ARTIFACT_REPO: kosiu/hdf5-build
+      ONEAPI_ROOT: C:\Program Files (x86)\Intel\oneAPI
+      ONEAPI_INSTALLER_URL: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/e63ac2b4-8a9a-4768-979a-399a8b6299de/intel-oneapi-hpc-toolkit-2025.2.1.46_offline.exe
 
     steps:
       - name: Checkout sources
@@ -32,11 +34,50 @@ jobs:
           cmakeVersion: 4.4.0
           ninjaVersion: latest
 
-      - name: Install Intel oneAPI compiler
-        uses: fortran-lang/setup-fortran@v1
-        with:
-          compiler: intel
-          version: '2025.2'
+      - name: Install Intel oneAPI HPC Toolkit
+        shell: cmd
+        run: |
+          curl.exe --output "%TEMP%\webimage.exe" --url "%ONEAPI_INSTALLER_URL%" --retry 5 --retry-delay 5
+          start /b /wait "" "%TEMP%\webimage.exe" -s -x -f
+          "%TEMP%\webimage_extracted" --log "%TEMP%\extract.log"
+          "%TEMP%\webimage_extracted\bootstrapper.exe" -s --action install --eula=accept -p=NEED_VS2017_INTEGRATION=0 -p=NEED_VS2019_INTEGRATION=0 -p=NEED_VS2022_INTEGRATION=0 --log-dir="%TEMP%\intel-install-logs"
+
+      - name: Activate Intel oneAPI environment
+        shell: cmd
+        run: |
+          ver | findstr /i "10\.0\.17" && set VS2019INSTALLDIR=C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise
+          ver | findstr /i "10\.0\.20" && set VS2022INSTALLDIR=C:\Program Files\Microsoft Visual Studio\2022\Enterprise
+          call "%ONEAPI_ROOT%\setvars.bat"
+          set SETVARS_COMPLETED=1
+          set FC=ifx
+          set CC=icx
+          set CXX=icx
+          set FPM_FC=ifx
+          set FPM_CC=icx
+          set FPM_CXX=icx
+          set | findstr /c:"oneAPI" >> "%GITHUB_ENV%"
+          echo SETVARS_COMPLETED=1>>"%GITHUB_ENV%"
+          echo FC=ifx>>"%GITHUB_ENV%"
+          echo CC=icx>>"%GITHUB_ENV%"
+          echo CXX=icx>>"%GITHUB_ENV%"
+          echo FPM_FC=ifx>>"%GITHUB_ENV%"
+          echo FPM_CC=icx>>"%GITHUB_ENV%"
+          echo FPM_CXX=icx>>"%GITHUB_ENV%"
+
+      - name: Verify Intel oneMKL files
+        shell: pwsh
+        run: |
+          $requiredPaths = @(
+            (Join-Path $env:ONEAPI_ROOT 'mkl/latest/include/mkl_pardiso.f90'),
+            (Join-Path $env:ONEAPI_ROOT 'mkl/latest/lib/mkl_blas95_lp64.lib'),
+            (Join-Path $env:ONEAPI_ROOT 'mkl/latest/lib/mkl_lapack95_lp64.lib')
+          )
+
+          foreach ($path in $requiredPaths) {
+            if (-not (Test-Path $path)) {
+              throw "Missing required Intel oneMKL file: $path"
+            }
+          }
 
       - name: Download latest HDF5 install artifact
         shell: pwsh
