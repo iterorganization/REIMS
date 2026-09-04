@@ -96,7 +96,7 @@ jobs:
         run: |
           cmake --build --preset ninja-release
 
-      - name: Stage artifact
+      - name: Stage executable artifact
         shell: pwsh
         run: |
           $stageDir = Join-Path $env:GITHUB_WORKSPACE 'artifact/reims'
@@ -110,37 +110,6 @@ jobs:
             throw "Expected build output not found: $exePath"
           }
           Copy-Item -Path $exePath -Destination $stageDir
-
-          $runtimeDlls = @(
-            'libifcoremd.dll',
-            'libifportmd.dll',
-            'libmmd.dll',
-            'svml*.dll',
-            'libiomp5md.dll',
-            'mkl_core*.dll',
-            'mkl_intel_thread*.dll',
-            'mkl_intel_lp64*.dll',
-            'msvcp140.dll',
-            'vcruntime140.dll',
-            'vcruntime140_1.dll'
-          )
-
-          $searchRoots = @(
-            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/bin'),
-            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/bin/intel64'),
-            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/bin/compiler'),
-            (Join-Path $env:ONEAPI_ROOT 'compiler/latest/redist/intel64_win/compiler'),
-            (Join-Path $env:ONEAPI_ROOT 'redist/intel64_win/compiler'),
-            (Join-Path $env:ONEAPI_ROOT 'mkl/latest/redist/intel64'),
-            $env:VCToolsRedistDir
-          ) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
-
-          foreach ($dll in $runtimeDlls) {
-            $match = Get-ChildItem -Path $searchRoots -Filter $dll -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-            if ($match) {
-              Copy-Item -Path $match.FullName -Destination $stageDir -Force
-            }
-          }
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
