@@ -283,7 +283,7 @@ function input_int1d(me,key,default_value,n) result(val)
     class(input_t), intent(in) :: me
     character(*),    intent(in) :: key
     integer, optional, intent(in) :: default_value(:) !! default value in case of missing key
-    integer, optional, intent(in) :: n
+    integer, optional, intent(in) :: n !! expected number of elements in the array (can be used broadcast scalar to array)
     integer, allocatable :: val(:)
 
     type(type_list_item),  pointer :: item

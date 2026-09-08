@@ -59,7 +59,7 @@
           "description": "Value if nothing is specified by the user: ``4.0``\n\nThis value is related to automatic time step management - It is advised to modify\nimplicit_tolerance and keep the default value of the gain.\n"
         },
         "max_time_step": {
-          "$ref": "#/$defs/numeric_value",
+          "$ref": "#/$defs/0D_signal",
           "title": "Maximum time step (s)",
           "default": 50.0,
           "description": "Value if nothing is specified by the user: ``50.0``"
@@ -370,16 +370,7 @@
           "type": "integer"
         },
         "length": {
-          "oneOf": [
-            {
-              "title": "Total length (m) of helium channel - In case of uniform mesh",
-              "$ref": "#/$defs/numeric_value"
-            },
-            {
-              "title": "Length of each node (m) - In case of non-uniform mesh",
-              "$ref": "#/$defs/1D_numeric_value"
-            }
-          ]
+          "$ref": "#/$defs/length_value"
         },
         "diameter": {
           "title": "Hydraulic diameter (m) - Constant value along the channel",
@@ -486,16 +477,7 @@
           "type": "integer"
         },
         "length": {
-          "oneOf": [
-            {
-              "title": "Total length (m) of helium channel - In case of uniform mesh",
-              "$ref": "#/$defs/numeric_value"
-            },
-            {
-              "title": "Length of each node (m) - In case of non-uniform mesh",
-              "$ref": "#/$defs/1D_numeric_value"
-            }
-          ]
+          "$ref": "#/$defs/length_value"
         },
         "initial": {
           "properties": {
@@ -531,8 +513,7 @@
           },
           "required": [
             "material",
-            "area",
-            "RRR"
+            "area"
           ],
           "type": "object"
         },
@@ -550,9 +531,7 @@
           },
           "required": [
             "material",
-            "area",
-            "E0",
-            "nPow"
+            "area"
           ],
           "type": "object"
         },
@@ -614,10 +593,7 @@
         "stabilizer",
         "superconductor",
         "channel_link",
-        "flux",
-        "field",
-        "field_gradient",
-        "current"
+        "field"
       ]
     },
     "solid": {
@@ -633,7 +609,7 @@
         },
         "length": {
           "title": "Length (m) of each metal chunk along the CICC trajectory",
-          "$ref": "#/$defs/1D_numeric_value"
+          "$ref": "#/$defs/length_value"
         },
         "volume": {
           "title": "Volume (m^3) of each metal chunk",
@@ -662,8 +638,8 @@
           "description": "Built-in names: ``copper``, ``nb3sn``, ``nbti``, ``stainless_steel``,\n``glass_epoxy``, ``glass_kapton_glass``.\nCustom materials can be defined in ``materials`` (see :ref:`top-level-configuration`).\n"
         },
         "channel_link": {
-          "$ref": "#/$defs/1D_bool",
-          "title": "Thermal link with hydraulic channel per metal chunk"
+          "title": "Thermal link with hydraulic channel per metal chunk",
+          "$ref": "#/$defs/1D_bool"
         },
         "solid_link": {
           "$ref": "#/$defs/bool",
@@ -688,10 +664,8 @@
         "initial",
         "conduction_between_nodes",
         "material",
-        "stabilizer",
         "channel_link",
-        "solid_link",
-        "flux"
+        "solid_link"
       ]
     },
     "mesh2D": {
@@ -1222,6 +1196,25 @@
         "link"
       ]
     },
+    "length_value": {
+      "description": "Total length, per-node lengths, or an HDF5 dataset reference.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/h5"
+        },
+        {
+          "title": "Total length (m) of helium channel - In case of uniform mesh",
+          "type": "number"
+        },
+        {
+          "title": "Length of each node (m) - In case of non-uniform mesh",
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      ]
+    },
     "1D_signal": {
       "description": ".. code:: yaml\n\n  Example:\n    flux:                          # Heat load\n      time:  [   0,  100]          # Time scenario (s)     - 2 instants\n      x:     [ 0.0,  5.0,  10.0]   # Spatial positions (m) - 3 points\n      value: [[0.1,  0.2],         # x=0.0m : value at t=0, t=100\n              [0.3,  0.5],         # x=5.0m : value at t=0, t=100\n              [0.2,  0.3]]         # x=10.0m: value at t=0, t=100\n                                   # value dimension is [n_x=3 x n_time=2]\n      order:  0                    # 0 order in time\n      repeat: 0                    # No scenario repeat\n      event:  implicit             # 3 consecutive explicit steps are enforced each time the simulation\n                                   # physical time reaches one of the values specified in 'time'\n\n  Example (in case of an external DLL):\n    flux:\n      external: my_signal_func  # Function name exported by the DLL\n      my_param: 1.0             # Any extra parameters passed to the DLL at init\n",
       "type": "object",
@@ -1337,7 +1330,13 @@
       ],
       "oneOf": [
         {
-          "type": "2D array of numbers"
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
         },
         {
           "$ref": "#/$defs/h5"
@@ -1354,7 +1353,10 @@
       ],
       "oneOf": [
         {
-          "type": "1D array of numbers"
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
         },
         {
           "$ref": "#/$defs/h5"
@@ -1364,6 +1366,7 @@
     "numeric_value": {
       "examples": [
         0.0,
+        4,
         {
           "data": "group/dataset",
           "h5": "file.h5"
@@ -1380,44 +1383,81 @@
     },
     "1D_string": {
       "examples": "['name1','name2']",
-      "type": "1D array of strings"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "1D_integer": {
       "examples": "[0,0]",
-      "type": "1D array of integers"
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        {
+          "$ref": "#/$defs/range"
+        }
+      ]
+    },
+    "range": {
+      "title": "Range for 1D integer array",
+      "description": "Range for 1D integer array, specifying the start (from), end (to), and step size (step).\nStep can be negative to allow for decreasing sequences.\n",
+      "type": "object",
+      "properties": {
+        "to": {
+          "type": "integer"
+        },
+        "from": {
+          "type": "integer",
+          "default": 1
+        },
+        "step": {
+          "type": "integer",
+          "default": 1
+        }
+      },
+      "required": [
+        "to"
+      ],
+      "examples": [
+        {
+          "to": 10
+        },
+        {
+          "from": 5,
+          "to": -5,
+          "step": 3
+        }
+      ]
     },
     "1D_bool": {
       "title": "1D Boolean array",
-      "enum": [
-        "true",
-        "True",
-        "TRUE",
-        "on",
-        "On",
-        "ON",
-        "y",
-        "Y",
-        "yes",
-        "Yes",
-        "YES",
-        "false",
-        "False",
-        "FALSE",
-        "off",
-        "Off",
-        "OFF",
-        "n",
-        "N",
-        "no",
-        "No",
-        "NO"
-      ],
-      "examples": "['yes','no']",
-      "type": "1D array of strings"
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/bool"
+      },
+      "examples": [
+        [
+          false,
+          "y",
+          "yes"
+        ],
+        [
+          "n",
+          "n",
+          "n"
+        ]
+      ]
     },
     "bool": {
       "title": "Boolean value",
+      "description": "This value can be boolean or string which is interpreted as a boolean.",
       "enum": [
+        true,
+        false,
         "true",
         "True",
         "TRUE",
@@ -1442,47 +1482,12 @@
         "NO"
       ],
       "examples": [
-        "yes"
-      ],
-      "type": "string"
-    },
-    "b_true": {
-      "enum": [
-        "true",
-        "True",
-        "TRUE",
+        true,
+        false,
+        true,
         "on",
-        "On",
-        "ON",
-        "y",
-        "Y",
-        "yes",
-        "Yes",
-        "YES"
-      ],
-      "examples": [
-        "yes"
-      ],
-      "type": "string"
-    },
-    "b_false": {
-      "enum": [
-        "false",
-        "False",
-        "FALSE",
-        "off",
-        "Off",
-        "OFF",
-        "n",
-        "N",
-        "no",
-        "No",
-        "NO"
-      ],
-      "examples": [
-        "no"
-      ],
-      "type": "string"
+        false
+      ]
     }
   }
 }

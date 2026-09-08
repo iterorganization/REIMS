@@ -20,6 +20,9 @@ description: |
 type: object
 required: [simulation,write_results,components]
 properties:
+  #------------------------------------------------
+  #       Top level configuration
+  #------------------------------------------------
   simulation:
     title: Simulation parameters
     type: object
@@ -81,7 +84,7 @@ properties:
           This value is related to automatic time step management - It is advised to modify
           implicit_tolerance and keep the default value of the gain.
       max_time_step:
-        $ref: '#/$defs/numeric_value'
+        $ref: '#/$defs/0D_signal'
         title: Maximum time step (s)
         default: 50.0
         description: 'Value if nothing is specified by the user: ``50.0``'
@@ -169,7 +172,6 @@ properties:
       Three use cases are supported: built-in with defaults, built-in with custom
       parameters, or user-defined via external DLL.
       See :ref:`friction-correlations-details` for details and examples.
-
   nusselt_correlations:
     title: Nusselt number correlations
     type: array
@@ -212,7 +214,6 @@ properties:
       fluidlink and thermalink components. Three use cases are supported:
       built-in with defaults, built-in with custom parameters, or user-defined
       via external DLL. See :ref:`nusselt-correlations-details` for details and examples.
-
   materials:
     title: Material database
     type: array
@@ -275,7 +276,6 @@ properties:
       ``Bc20m``, ``Tc0m``, ``nu``, ``Ca1``, ``Ca2``, ``e0a``, ``emax``,
       ``C0``, ``p``, ``q``, ``str1``, ``str2``,
       ``Bc20``, ``Tc0_p``, ``CC0``, ``n``.
-
   components:
     title: List of components to describe the model
     type: array
@@ -311,7 +311,11 @@ properties:
           boundary_PT: '#/$defs/boundary_PT'
           boundary_mT: '#/$defs/boundary_mT'
 
-$defs:   
+
+$defs:
+  #------------------------------------------------
+  #       Component definitions
+  #------------------------------------------------
   channel:
     title: channel
     description: |
@@ -340,11 +344,7 @@ $defs:
          uniform mesh
         type: integer
       length:
-        oneOf:     
-        - title: Total length (m) of helium channel - In case of uniform mesh
-          $ref: '#/$defs/numeric_value'
-        - title: Length of each node (m) - In case of non-uniform mesh
-          $ref: '#/$defs/1D_numeric_value'
+        $ref: '#/$defs/length_value'
       diameter:
         title: Hydraulic diameter (m) - Constant value along the channel
         $ref: '#/$defs/numeric_value'
@@ -460,11 +460,8 @@ $defs:
          uniform mesh
         type: integer
       length:
-        oneOf:     
-        - title: Total length (m) of helium channel - In case of uniform mesh
-          $ref: '#/$defs/numeric_value'
-        - title: Length of each node (m) - In case of non-uniform mesh
-          $ref: '#/$defs/1D_numeric_value'
+        $ref: '#/$defs/length_value'
+
       initial:
         properties:
           t:
@@ -493,7 +490,6 @@ $defs:
         required:
         - material
         - area
-        - RRR
         type: object
       superconductor:
         properties:
@@ -509,8 +505,6 @@ $defs:
         required:
         - material
         - area
-        - E0
-        - nPow
         type: object        
       channel_link:
         $ref: '#/$defs/bool'
@@ -539,7 +533,7 @@ $defs:
         - $ref: '#/$defs/numeric_value'
         - $ref: '#/$defs/0D_signal'
     required: [id,length,initial,CICC_inner_radius,CICC_outer_radius,stabilizer,superconductor,
-                channel_link,flux,field,field_gradient,current]
+                channel_link,field]
   solid:
     title: solid
     description: |
@@ -568,7 +562,7 @@ $defs:
         type: string
       length:
         title: Length (m) of each metal chunk along the CICC trajectory
-        $ref: '#/$defs/1D_numeric_value'        
+        $ref: '#/$defs/length_value'
       volume:
         title: Volume (m^3) of each metal chunk
         description: |
@@ -594,8 +588,8 @@ $defs:
           ``glass_epoxy``, ``glass_kapton_glass``.
           Custom materials can be defined in ``materials`` (see :ref:`top-level-configuration`).
       channel_link:
-        $ref: '#/$defs/1D_bool'
         title: Thermal link with hydraulic channel per metal chunk
+        $ref: '#/$defs/1D_bool'
       solid_link:
         $ref: '#/$defs/bool'
         title: Thermal link with other solid
@@ -605,7 +599,7 @@ $defs:
         oneOf:
         - $ref: '#/$defs/numeric_value'
         - $ref: '#/$defs/1D_signal'
-    required: [id,length,volume,initial,conduction_between_nodes,material,stabilizer,channel_link,solid_link,flux]
+    required: [id,length,volume,initial,conduction_between_nodes,material,channel_link,solid_link]
   mesh2D:
     title: mesh2D
     description: |
@@ -1191,6 +1185,10 @@ $defs:
         - id
         - node
     required: [mdot,t,link]
+
+  #------------------------------------------------
+  #       Low level input definitions
+  #------------------------------------------------
   1D_signal:
     description: |
       .. code:: yaml
@@ -1316,6 +1314,15 @@ $defs:
                  reaches one of the values specified in 'time'.
         type: string
     required: [time,value]
+  length_value:
+      description: Total length, per-node lengths, or an HDF5 dataset reference.
+      oneOf:     
+        - $ref: '#/$defs/h5'
+        - title: Total length (m) of helium channel - In case of uniform mesh
+          type: number
+        - title: Length of each node (m) - In case of non-uniform mesh
+          type: array
+          items: { type: number }
   h5:
     type: object
     required: [h5,data]
@@ -1330,36 +1337,42 @@ $defs:
         type: string    
   2D_numeric_value:
     examples: ["[[0.0,0.0],[0.0,0.0]]", {data: group/dataset, h5: file.h5}]
-    oneOf: [type: 2D array of numbers, $ref: '#/$defs/h5']    
+    oneOf: [{type: array, items: {type: array, items: {type: number}}}, {$ref: '#/$defs/h5'}]
   1D_numeric_value:
     examples: ["[0.0,0.0]", {data: group/dataset, h5: file.h5}]
-    oneOf: [type: 1D array of numbers, $ref: '#/$defs/h5']
+    oneOf: [{type: array, items: {type: number}}, {$ref: '#/$defs/h5'}]
   numeric_value:
-    examples: [0.0, {data: group/dataset, h5: file.h5}]
-    oneOf: [type: number, $ref: '#/$defs/h5']
+    examples: [0.0, 4, {data: group/dataset, h5: file.h5}]
+    oneOf: [{type: number}, {$ref: '#/$defs/h5'}]
   1D_string:
     examples: "['name1','name2']"
-    type: 1D array of strings
+    type: array
+    items: {type: string}
   1D_integer:
     examples: "[0,0]"
-    type: 1D array of integers
+    oneOf:
+    - {type: array, items: {type: integer}}
+    - $ref: '#/$defs/range'
+  range:
+    title: Range for 1D integer array
+    description: |
+      Range for 1D integer array, specifying the start (from), end (to), and step size (step).
+      Step can be negative to allow for decreasing sequences.
+    type: object
+    properties:
+      to: {type: integer}
+      from: {type: integer, default: 1}
+      step: {type: integer, default: 1}
+    required: [to]
+    examples: [{to: 10},{from: 5, to: -5, step: 3}]
   1D_bool:
     title: 1D Boolean array
-    enum: ['true','True','TRUE','on','On','ON','y','Y','yes','Yes','YES',
-      'false','False','FALSE','off','Off','OFF','n','N','no','No','NO']
-    examples: "['yes','no']"
-    type: 1D array of strings
+    type: array
+    items: {$ref: '#/$defs/bool'}
+    examples: [[no, y, 'yes'], [n,n,n]]
   bool:
     title: Boolean value
-    enum: ['true','True','TRUE','on','On','ON','y','Y','yes','Yes','YES',
+    description: This value can be boolean or string which is interpreted as a boolean.
+    enum: [true,false,'true','True','TRUE','on','On','ON','y','Y','yes','Yes','YES',
       'false','False','FALSE','off','Off','OFF','n','N','no','No','NO']
-    examples: ['yes']
-    type: string    
-  b_true:
-    enum: ['true','True','TRUE','on','On','ON','y','Y','yes','Yes','YES']
-    examples: ['yes']
-    type: string
-  b_false:
-    enum: ['false','False','FALSE','off','Off','OFF','n','N','no','No','NO']
-    examples: ['no']
-    type: string    
+    examples: [true, false, on, 'on', no]
