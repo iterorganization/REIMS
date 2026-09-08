@@ -1284,15 +1284,13 @@ $defs:
           description: |
             It can be:
 
-            ``'no'`` (value if nothing is specified by the user) if the user does not want to
-                  take care of specific events based on the 'time' data (the time step automatically
-                  evolves without intervention),
-            
-            ``'explicit'``: 3 consecutive explicit steps are enforced each time the simulation
-                  physical time reaches one of the values specified in 'time',
-            
-            ``'implicit'``: 1 implicit step is enforced each time the simulation physical time
-                  reaches one of the values specified in 'time'.
+            - ``'no'`` (value if nothing is specified by the user) if the user does not want to
+              take care of specific events based on the 'time' data (the time step automatically
+              evolves without intervention),
+            - ``'explicit'``: 3 consecutive explicit steps are enforced each time the simulation
+              physical time reaches one of the values specified in 'time',
+            - ``'implicit'``: 1 implicit step is enforced each time the simulation physical time
+              reaches one of the values specified in 'time'.
           type: string
       required: [time,value]
   length_value:

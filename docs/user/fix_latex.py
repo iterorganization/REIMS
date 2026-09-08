@@ -30,7 +30,26 @@ content = content.replace(
     r'\begin{tabulary}{\linewidth}[t]{p{4.0cm}LLL}'
 )
 
+# Fix tabular X/X/X and X/X/X/X schema tables: equal-width columns squeeze
+# property names and long references in PDF. Use asymmetric wrapped columns.
+count_tabular3 = content.count(r'\begin{tabular}[t]{*{3}{\X{1}{3}}}')
+content = content.replace(
+    r'\begin{tabular}[t]{*{3}{\X{1}{3}}}',
+    r'\begin{tabular}[t]{p{4.2cm}p{2.6cm}p{6.7cm}}'
+)
+
+count_tabular4 = content.count(r'\begin{tabular}[t]{*{4}{\X{1}{4}}}')
+content = content.replace(
+    r'\begin{tabular}[t]{*{4}{\X{1}{4}}}',
+    r'\begin{tabular}[t]{p{3.9cm}p{2.0cm}p{2.0cm}p{5.1cm}}'
+)
+
 with open('_build/latex/reims.tex', 'w', encoding='utf-8') as f:
     f.write(content)
 
-print(f'Fixed {count_lll} lll, {count_llll} llll longtables; {count_ttt} TTT, {count_tttt} TTTT tabulary')
+print(
+    'Fixed '
+    f'{count_lll} lll, {count_llll} llll longtables; '
+    f'{count_ttt} TTT, {count_tttt} TTTT tabulary; '
+    f'{count_tabular3} 3-col and {count_tabular4} 4-col tabular tables'
+)
