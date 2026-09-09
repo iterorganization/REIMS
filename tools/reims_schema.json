@@ -21,12 +21,6 @@
           "$ref": "#/$defs/numeric_value",
           "title": "End of simulation (s)"
         },
-        "FrictionRS": {
-          "$ref": "#/$defs/bool",
-          "default": true,
-          "title": "Friction within Riemann solver + junctions",
-          "description": "Value if nothing is specified by the user: ``yes``\n       \n- ``yes``: Simulation will consider friction within Riemann solver - useful in case\n  of high dP + coarse mesh\n\n- ``no``: No correction within the Riemann solver - Friction still active but potentially\n  less accurate in case of high dP + coarse mesh\n"
-        },
         "R_correction": {
           "$ref": "#/$defs/bool",
           "default": true,
