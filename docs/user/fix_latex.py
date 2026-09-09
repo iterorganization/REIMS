@@ -21,13 +21,13 @@ content = content.replace(
 count_ttt = content.count(r'\begin{tabulary}{\linewidth}[t]{TTT}')
 content = content.replace(
     r'\begin{tabulary}{\linewidth}[t]{TTT}',
-    r'\begin{tabulary}{\linewidth}[t]{p{3.2cm}p{2cm}L}'
+    r'\begin{tabulary}{\linewidth}[t]{p{3.2cm}p{2cm}p{11cm}}'
 )
 
 count_tttt = content.count(r'\begin{tabulary}{\linewidth}[t]{TTTT}')
 content = content.replace(
     r'\begin{tabulary}{\linewidth}[t]{TTTT}',
-    r'\begin{tabulary}{\linewidth}[t]{p{3.2cm}p{2cm}LL}'
+    r'\begin{tabulary}{\linewidth}[t]{p{3.2cm}p{2cm}p{3cm}p{8cm}}'
 )
 
 count_ttttt = content.count(r'\begin{tabulary}{\linewidth}[t]{TTTTT}')
