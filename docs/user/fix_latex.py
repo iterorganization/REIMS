@@ -21,28 +21,51 @@ content = content.replace(
 count_ttt = content.count(r'\begin{tabulary}{\linewidth}[t]{TTT}')
 content = content.replace(
     r'\begin{tabulary}{\linewidth}[t]{TTT}',
-    r'\begin{tabulary}{\linewidth}[t]{p{4.5cm}LL}'
+    r'\begin{tabulary}{\linewidth}[t]{p{3.2cm}p{2cm}L}'
 )
 
 count_tttt = content.count(r'\begin{tabulary}{\linewidth}[t]{TTTT}')
 content = content.replace(
     r'\begin{tabulary}{\linewidth}[t]{TTTT}',
-    r'\begin{tabulary}{\linewidth}[t]{p{4.0cm}LLL}'
+    r'\begin{tabulary}{\linewidth}[t]{p{3.2cm}p{2cm}LL}'
 )
 
-# Fix tabular X/X/X and X/X/X/X schema tables: equal-width columns squeeze
-# property names and long references in PDF. Use asymmetric wrapped columns.
-count_tabular3 = content.count(r'\begin{tabular}[t]{*{3}{\X{1}{3}}}')
+count_ttttt = content.count(r'\begin{tabulary}{\linewidth}[t]{TTTTT}')
 content = content.replace(
-    r'\begin{tabular}[t]{*{3}{\X{1}{3}}}',
-    r'\begin{tabular}[t]{p{4.2cm}p{2.6cm}p{6.7cm}}'
+    r'\begin{tabulary}{\linewidth}[t]{TTTTT}',
+    r'\begin{tabulary}{\linewidth}[t]{p{3.2cm}p{2cm}LLL}'
 )
 
-count_tabular4 = content.count(r'\begin{tabular}[t]{*{4}{\X{1}{4}}}')
+# Reduce the horizontal indentation of itemize lists, including those in tables.
+list_preamble = r'''\usepackage{enumitem}
+\setlist[itemize]{leftmargin=1.1em,labelsep=0.25em}
+'''
+count_document = content.count(r'\begin{document}')
 content = content.replace(
-    r'\begin{tabular}[t]{*{4}{\X{1}{4}}}',
-    r'\begin{tabular}[t]{p{3.9cm}p{2.0cm}p{2.0cm}p{5.1cm}}'
+    r'\begin{document}',
+    list_preamble + r'\begin{document}'
 )
+
+# Fix spacing issue in 'time_between_2D_writes'
+content = content.replace(
+    r'time\_between\_2D\_writes',
+    r'time\_between\_ 2D\_writes'
+)
+
+# inject new chapters for better organization
+content = content.replace(
+    r'\subsubsection{channel}',
+    r'\subsection{State components}\subsubsection{channel}'
+)
+content = content.replace(
+    r'\subsubsection{junction}',
+    r'\subsection{Link components}\subsubsection{junction}'
+)
+content = content.replace(
+    r'\subsubsection{0D\_signal}',
+    r'\subsection{Common definitions}\subsubsection{0D\_signal}'
+)
+
 
 with open('_build/latex/reims.tex', 'w', encoding='utf-8') as f:
     f.write(content)
@@ -50,6 +73,7 @@ with open('_build/latex/reims.tex', 'w', encoding='utf-8') as f:
 print(
     'Fixed '
     f'{count_lll} lll, {count_llll} llll longtables; '
+    f'updated itemize indentation in {count_document} document preamble; '
     f'{count_ttt} TTT, {count_tttt} TTTT tabulary; '
-    f'{count_tabular3} 3-col and {count_tabular4} 4-col tabular tables'
+    f'{count_ttttt} TTTTT tabulary'
 )

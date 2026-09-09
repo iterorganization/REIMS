@@ -29,7 +29,9 @@ Input file description
   Small example of input file is shown below:
 
   .. code:: yaml
-    
+       
+    # yaml-language-server: $schema=https://iterorganization.github.io/REIMS/tools/reims_schema.json
+
     simulation:         
       simulation_end: 1000        # Simulate 1000s
       implicit_tolerance: 0.0005  # Tolerance for implicit solver
