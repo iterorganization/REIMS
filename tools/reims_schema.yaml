@@ -268,7 +268,7 @@ properties:
     items:
       type: object
       required: [type]
-      oneOf:
+      OneOf:
       - $ref: '#/$defs/channel'
       - $ref: '#/$defs/strand'
       - $ref: '#/$defs/solid'
@@ -304,6 +304,7 @@ $defs:
   #------------------------------------------------
   channel:
     title: channel
+    type: object
     description: |
      1D pipe filled with compressible helium
 
@@ -398,6 +399,7 @@ $defs:
     required: [id,length,diameter,initial,friction]
   strand:
     title: strand
+    type: object
     description: |
      1D composite strand that contains a superconducting material in parallel with a stabilizer
      shunt
@@ -510,6 +512,7 @@ $defs:
                 channel_link,field]
   solid:
     title: solid
+    type: object
     description: |
      The lumped mass approach is used to define the part of the structure in contact with CICCs -
      A solid component is an array of solid chunks, each carrying its own temperature
@@ -574,6 +577,7 @@ $defs:
     required: [id,length,volume,initial,conduction_between_nodes,material,channel_link,solid_link]
   mesh2D:
     title: mesh2D
+    type: object
     description: |
       2D surface representing a slice of a 3D solid structure - Available for heat diffusion
       treatment
@@ -674,6 +678,7 @@ $defs:
     - material
     - source
   mesh2D_edge:
+    type: object
     properties:
       label:
         title: Name of the label that identifies a specific 1D boundary of the 2D geometry
@@ -694,13 +699,13 @@ $defs:
     - label
     - type
     - value    
-    type: object
 
   #------------------------------------------------
   #       Links definitions
   #------------------------------------------------  
   junction:
     title: junction
+    type: object
     description: |
       A junction connects 1D helium channels together
 
@@ -759,6 +764,7 @@ $defs:
     - node
   fluidlink:
     title: fluidlink
+    type: object
     description: |
      Fluid-FLuid link that connects one helium channel to another - Transverse mass, momentum and
      energy exchanges are allowed
@@ -812,6 +818,7 @@ $defs:
     - node  
   thermalink:
     title: thermalink
+    type: object
     description: |
       Fluid-Solid link that thermally connects one helium channel to one of the following components
       (strand, solid or mesh2D)
@@ -902,6 +909,7 @@ $defs:
     - id
   solidlink:  
     title: solidlink
+    type: object
     description: |
      Solid-Solid link that thermally connects a solid component with another, or a solid component
      with a mesh2D slice.
@@ -994,6 +1002,7 @@ $defs:
         $ref: '#/$defs/1D_numeric_value'
   pump:
     title: pump
+    type: object
     description: |
      A pump connects two 1D helium channels together
 
@@ -1022,6 +1031,7 @@ $defs:
     required: [m0,link]        
   compressor:
     title: compressor
+    type: object
     description: |
      A compressor connects two 1D helium channels together
 
@@ -1070,6 +1080,7 @@ $defs:
     - node
   boundary_PT:
     title: boundary_PT
+    type: object
     description: |
       Helium tank with imposed pressure and temperature acting as an inflow boundary condition - 
       This inflow may become an outflow under certain circumstances
@@ -1120,6 +1131,7 @@ $defs:
     required: [p,t,link]
   boundary_mT:
     title: boundary_mT
+    type: object
     description: |
       Helium inflow boundary condition with imposed mass flow rate and temperature
 
@@ -1173,7 +1185,7 @@ $defs:
           p:
             external: my_signal_func  # Function name exported by the DLL
             my_param: 1.0             # Any extra parameters passed to the DLL at init
-    oneOf:
+    OneOf:
     - type: number
     - type: object
       properties:
@@ -1289,7 +1301,7 @@ $defs:
     required: [time,x,value]
   length_value:
       description: Total length, per-node lengths, or an HDF5 dataset reference.
-      oneOf:     
+      OneOf:     
         - $ref: '#/$defs/h5'
         - title: Total length (m) of helium channel - In case of uniform mesh
           type: number
@@ -1310,20 +1322,20 @@ $defs:
         type: string    
   2D_numeric_value:
     examples: ["[[0.0,0.0],[0.0,0.0]]", {data: group/dataset, h5: file.h5}]
-    oneOf: [{type: array, items: {type: array, items: {type: number}}}, {$ref: '#/$defs/h5'}]
+    OneOf: [{type: array, items: {type: array, items: {type: number}}}, {$ref: '#/$defs/h5'}]
   1D_numeric_value:
     examples: ["[0.0,0.0]", {data: group/dataset, h5: file.h5}]
-    oneOf: [{type: array, items: {type: number}}, {$ref: '#/$defs/h5'}]
+    OneOf: [{type: array, items: {type: number}}, {$ref: '#/$defs/h5'}]
   numeric_value:
     examples: [0.0, 4, {data: group/dataset, h5: file.h5}]
-    oneOf: [{type: number}, {$ref: '#/$defs/h5'}]
+    OneOf: [{type: number}, {$ref: '#/$defs/h5'}]
   1D_string:
     examples: "['name1','name2']"
     type: array
     items: {type: string}
   1D_integer:
     examples: "[0,0]"
-    oneOf:
+    OneOf:
     - {type: array, items: {type: integer}}
     - $ref: '#/$defs/range'
   range:
