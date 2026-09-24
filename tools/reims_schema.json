@@ -385,8 +385,7 @@
           },
           "required": [
             "p",
-            "t",
-            "u"
+            "t"
           ],
           "type": "object"
         },

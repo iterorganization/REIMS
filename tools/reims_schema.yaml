@@ -359,7 +359,6 @@ $defs:
         required:
         - p
         - t
-        - u
         type: object
       thermal:
         default: flux

@@ -392,6 +392,22 @@
       "args": [
         "${cmake.binaryDir}/../../reims_model_tf/configurations/TF_MCTF/TF_MCTF_v21.yaml"
       ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "Training_Exo_1 debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_training/Exports/correction/Training_Exo_1.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "Training_Exo_1 release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_training/Exports/correction/Training_Exo_1.yaml"
+      ]
     }
   ]
 }

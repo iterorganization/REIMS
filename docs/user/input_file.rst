@@ -33,27 +33,28 @@ Input file description
     # yaml-language-server: $schema=https://iterorganization.github.io/REIMS/tools/reims_schema.json
 
     simulation:         
-      simulation_end: 1000        # Simulate 1000s
+      simulation_end: 2000        # Simulate 2000s
       implicit_tolerance: 0.0005  # Tolerance for implicit solver
     
     write_results:            
       file: reims_output.h5       # Write results to file: reims_output.h5
     
     # Main model description is a list of components and their connections
-    components:         # One "state" component and one "link" component
-      - type: channel   # Type of the component - In this case channel
-        id: pipe        # Name of the component has to be unique
-        nodes: 200      # Number of computation cells
-        length: 140.0   # Total length in m
-        diameter: 10e-3 # Channel diameter 12mm
-        initial: {p: 5.0e5, t: 4.3} # initial conditions P = 5bar and T = 4.3K
-      - type: pump   # Type of the component - In this case pump
-        m0: 2.0e-3   # Mass flow rate: 2 g/s
-        link:        # 2 links: link 1 - pump inlet, link 2 - pump outlet
-         - id: pipe  # inlet of the pump connected to outlet of the 'pipe'
-           node: out # outlet pipe
-         - id: pipe  # outlet of the pump connected to inlet of the 'pipe'
-           node: in  # inlet pipe
+    components: # One "state" component and one "link" component
+       - type: channel # Type of the component - In this case channel
+         id: pipe # Name of the component has to be unique
+         nodes: 150 # Number of computation cells
+         length: 100.0 # Total length in m
+         diameter: 8e-3 # Channel diameter 8mm
+         initial: {p: 5.0e5, t: 4.3} # initial conditions P = 5bar and T = 4.3K
+         friction: blasius # Friction model Blasius
+       - type: pump # Type of the component - In this case pump
+         m0: 10.0e-3 # Mass flow rate 10 g/s
+         link: # 2 links: link 1 - pump inlet, link 2 - pump outlet
+          - id: pipe # inlet of the pump connected to outlet of the 'pipe’
+            node: out # outlet pipe
+          - id: pipe # outlet of the pump connected to inlet of the 'pipe’
+            node: in # inlet pipe
   
   It describes 2 components:
   
