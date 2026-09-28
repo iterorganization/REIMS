@@ -37,7 +37,7 @@ subroutine writing_HDF5_2D_casing(me,time,step)
   character(len=3) :: stepChar
 
     if(step==0) then
-      call h5fcreate_f(me%filename_extless//".hdf", H5F_ACC_TRUNC_F, me%f_id_writing, error)  ! H5F_ACC_TRUNC_F deletes the file if already existing
+      call h5fcreate_f("results2D/"//me%filename_extless//".hdf", H5F_ACC_TRUNC_F, me%f_id_writing, error)  ! H5F_ACC_TRUNC_F deletes the file if already existing
     endif
 
     write(stepChar,'(i3.3)') step

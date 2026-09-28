@@ -94,10 +94,23 @@ properties:
           Value if nothing is specified by the user: ``0.0``
       active2D:
         $ref: '#/$defs/bool'
-        title: Writing to results to hdf5 files  - Mesh2D components     
+        title: Writing to results to hdf5 files  - Mesh2D components
         default: true
         description:   |
-          Value if nothing is specified by the user: ``true`` 
+          Value if nothing is specified by the user: ``true``
+
+          When ``active2D`` is set to ``true``, REIMS writes one ``.hdf`` file per
+          mesh2D slice into a ``results2D`` subfolder, created automatically next
+          to the input file. These raw files can be converted into ParaView-ready,
+          per-timestep files with the ``tools/2Dpostprocess.py`` script shipped in
+          the REIMS repository:
+
+          .. code:: cmd
+
+            cd <run folder>
+            python <path to REIMS repo>/tools/2Dpostprocess.py
+
+          The converted files are written to ``results2D/postproc``.
       time_between_2D_writes:
         $ref: '#/$defs/numeric_value'
         title: Time interval between two consecutive 2D result writes (s)
@@ -530,9 +543,10 @@ $defs:
           - type: solid                         # Component type
             id: chunk_3L_P1                     # Component Id
             length: [1.02,1.03, 1.03, 1.04]     # Length of each solid chunk along the
-                                                # CICC trajectory
+                                                # superconductor trajectory
             volume: [1.48,1.49, 1.49, 1.50]     # Volume of each solid chunk
             initial: {t: 4.3}                   # Initial temperature
+            conduction_between_nodes: no        # No thermal conduction between solid chunks along the superconductor trajectory
             material: stainless_steel           # Solid material
             channel_link: [yes, yes, yes, yes]  # Thermal link with a channel
                                             # component expected for each solid chunk
@@ -548,7 +562,7 @@ $defs:
         title: Number of nodes equally distanced along the solid length - Only used in case of uniform mesh
         type: integer
       length:
-        title: Length (m) of each metal chunk along the CICC trajectory
+        title: Length (m) of each metal chunk along the superconductor trajectory
         $ref: '#/$defs/length_value'
       volume:
         title: Volume (m^3) of each metal chunk
@@ -566,7 +580,7 @@ $defs:
         type: object
       conduction_between_nodes:
         $ref: '#/$defs/bool'
-        title: Thermal conduction between metal chunks along the CICC trajectory
+        title: Thermal conduction between metal chunks along the superconductor trajectory
       material:
         title: Material name
         type: string

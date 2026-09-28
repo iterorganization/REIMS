@@ -132,8 +132,18 @@ subroutine hdf5_init(me,cfg)
     real(dp)       :: data_global(2)
     integer        :: i, err
 
+    interface
+        function c_mkDir(new_path) bind(C, name="mkdir")
+            import :: c_int
+            character :: new_path(*)
+            integer(c_int) :: c_mkDir
+        end function
+    end interface
+
     me%write_results = cfg%bin('active',.true.)
-    me%write_results2D = cfg%bin('active2D',.true.)    
+    me%write_results2D = cfg%bin('active2D',.true.)
+
+    if(me%write_results2D) err = c_mkDir('results2D'//char(0))
 
     if(.not.me%write_results) return
     print*,'Writing of results ACTIVE'

@@ -506,7 +506,8 @@ subroutine mesh2D_init_part1(me, krn, cfg,sim)
     call all_mesh2D_allocation(me)     
 
     me%filename_extless = cfg%str('mesh')
-    me%filename_extless = me%filename_extless(9:index(me%filename_extless, '.msh')-1)
+    me%filename_extless = me%filename_extless(scan(me%filename_extless,'/\',.true.)+1: &
+                                               index(me%filename_extless, '.msh')-1)
 
     me%extrusion_length = cfg%dbl('extrusion_length',1.062_dp)
 
