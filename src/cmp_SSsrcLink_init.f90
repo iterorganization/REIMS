@@ -107,6 +107,11 @@ subroutine SSsrcLink_init_part2(me,krn,cfg)
       thicks=cfg%dbl1d('thickness', n=me%sizeNodes)
       do i = 1, me%sizeNodes
         me%lk(1,i)%p => krn%SS_src_ports(offset1 + nodes1(i))
+        if (me%lk(1,i)%p%mesh2D_linked) then
+            error stop 'solidlink: metal chunk "'//links(1)%str('id')//'" node '//to_str(nodes1(i))//&
+                ' already connected to a mesh2D slice - a chunk can only have one such connection.'
+        endif
+        me%lk(1,i)%p%mesh2D_linked = .true.
         me%lk(1,i)%p%Dist4Grad = distances1(i)
         do j=1,me%nb_2D_Ports(i)
           me%lk(1+j,i)%p => krn%SS_src_ports(krn%SS_src_list%find(links(2)%str('id')//"+"//trim(labels(i)%p),j))

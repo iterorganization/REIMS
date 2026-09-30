@@ -398,7 +398,7 @@
       "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
       "name": "Training_Exo_1 debug",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_1.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_1.yaml"
       ]
     },
     {
@@ -406,7 +406,7 @@
       "projectTarget": "reims.exe (src\\Release\\reims.exe)",
       "name": "Training_Exo_1 release",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_1.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_1.yaml"
       ]
     },
     {
@@ -414,7 +414,7 @@
       "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
       "name": "Training_Exo_2 debug",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_2.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_2.yaml"
       ]
     },
     {
@@ -422,7 +422,7 @@
       "projectTarget": "reims.exe (src\\Release\\reims.exe)",
       "name": "Training_Exo_2 release",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_2.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_2.yaml"
       ]
     },
     {
@@ -430,7 +430,7 @@
       "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
       "name": "Training_Exo_3 debug",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_3.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_3.yaml"
       ]
     },
     {
@@ -438,7 +438,7 @@
       "projectTarget": "reims.exe (src\\Release\\reims.exe)",
       "name": "Training_Exo_3 release",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_3.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_3.yaml"
       ]
     },
     {
@@ -446,7 +446,7 @@
       "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
       "name": "Training_Exo_4 debug",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_4.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_4.yaml"
       ]
     },
     {
@@ -454,7 +454,7 @@
       "projectTarget": "reims.exe (src\\Release\\reims.exe)",
       "name": "Training_Exo_4 release",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_4.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_4.yaml"
       ]
     },
     {
@@ -462,7 +462,7 @@
       "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
       "name": "Training_Exo_5 debug",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_5.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_5.yaml"
       ]
     },
     {
@@ -470,7 +470,7 @@
       "projectTarget": "reims.exe (src\\Release\\reims.exe)",
       "name": "Training_Exo_5 release",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_5.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_5.yaml"
       ]
     },
     {
@@ -478,7 +478,7 @@
       "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
       "name": "Training_Exo_6 debug",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_6.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_6.yaml"
       ]
     },
     {
@@ -486,7 +486,7 @@
       "projectTarget": "reims.exe (src\\Release\\reims.exe)",
       "name": "Training_Exo_6 release",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_6.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_6.yaml"
       ]
     },
     {
@@ -494,7 +494,7 @@
       "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
       "name": "Training_Exo_7 debug",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_7.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_7.yaml"
       ]
     },
     {
@@ -502,7 +502,7 @@
       "projectTarget": "reims.exe (src\\Release\\reims.exe)",
       "name": "Training_Exo_7 release",
       "args": [
-        "${cmake.binaryDir}/../../reims_training/exercices/Training_Exo_7.yaml"
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_7.yaml"
       ]
     }
   ]

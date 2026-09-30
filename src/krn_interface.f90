@@ -174,6 +174,7 @@ module krn_interface_m
     
     type, extends(port_t) :: SS_src_port_t
       character(6) :: typeS ! solid or mesh2D
+      logical :: mesh2D_linked = .false. ! true once this chunk node is connected to a mesh2D slice
       ! Solid -> Link
       real(dp) :: TempS, rhoS, VolS, Dist4Grad, LengthCont, Height, SurfS, cpS, dcpSdT, lambdS, DerlambdS
       ! Link -> Solid
