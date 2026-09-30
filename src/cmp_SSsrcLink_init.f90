@@ -39,7 +39,7 @@ subroutine SSsrcLink_init_part1(me,krn,cfg)
       nb_non_zeros_imp = 2*me%sizeNodes
     else if(links(2)%has_key('label')) then 
       allocate(me%nb_2D_Ports(me%sizeNodes))
-      labels=links(2)%str1d('label')
+      labels=links(2)%str1d('label', n=me%sizeNodes)
       do i = 1, me%sizeNodes
         me%nb_2D_Ports(i) = krn%SS_src_list%find_nbPorts(links(2)%str('id')//"+"//trim(labels(i)%p))
       enddo
@@ -78,7 +78,7 @@ subroutine SSsrcLink_init_part2(me,krn,cfg)
       allocate(me%lk(2,me%sizeNodes),me%SurfCont(me%sizeNodes),me%Lins(me%sizeNodes))
       allocate(me%DerSrcS1dT2(me%sizeNodes),me%DerSrcS2dT1(me%sizeNodes))
       allocate(me%Lk12(me%sizeNodes),me%Lk21(me%sizeNodes))
-      nodes2=links(2)%int1d('node')
+      nodes2=links(2)%int1d('node', n=me%sizeNodes)
       offset2 = krn%SS_src_list%find(links(2)%str('id'), 1) - 1
       distances2=links(2)%dbl1d('distance', n=me%sizeNodes)
       surfaces=cfg%dbl1d('contact_surface', n=me%sizeNodes)
@@ -103,7 +103,7 @@ subroutine SSsrcLink_init_part2(me,krn,cfg)
       allocate(me%lk(maxval(me%nb_2D_Ports(:))+1,me%sizeNodes))
       allocate(me%Lins(me%sizeNodes),me%LkArr(maxval(me%nb_2D_Ports(:))+1,maxval(me%nb_2D_Ports(:))+1,me%sizeNodes))
       allocate(me%Der4LkArr(maxval(me%nb_2D_Ports(:))+1,maxval(me%nb_2D_Ports(:))+1,me%sizeNodes))
-      labels=links(2)%str1d('label')
+      labels=links(2)%str1d('label', n=me%sizeNodes)
       thicks=cfg%dbl1d('thickness', n=me%sizeNodes)
       do i = 1, me%sizeNodes
         me%lk(1,i)%p => krn%SS_src_ports(offset1 + nodes1(i))

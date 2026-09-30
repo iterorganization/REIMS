@@ -630,7 +630,7 @@ $defs:
                 source:                    # Heat load scenario to be specified
                   time:  {h5: Qcase_00.h5, data: t}  # Time scenario (s)
                   value: {h5: Qcase_00.h5, data: d}  # Heat load scenario consistent with the
-                                           # time array (W/m)
+                                           # time array (W)
             edges:                         # Introduces the list of labels that identify specific 1D
                                            # boundaries of the 2D geometry
               - {label: BC_bound,   type: flux,  value: 0.0}  # No heat flux to the 1D boundary
@@ -694,8 +694,9 @@ $defs:
           Built-in names: ``copper``, ``nb3sn``, ``nbti``, ``stainless_steel``,
           ``glass_epoxy``, ``glass_kapton_glass``.
           Custom materials can be defined in ``materials`` (see :ref:`top-level-configuration`).
-      source: 
+      source:
         title: Heat load applied (W) to the region identified by the label
+        description: Total power for the whole region, regardless of mesh refinement.
         $ref: '#/$defs/0D_signal'
     required:
     - label
@@ -716,9 +717,10 @@ $defs:
         - temp
         - flux
         type: string     
-      value: 
+      value:
         title: Imposed temperature (K) of thermal flux (W) depending on the type of the thermal boundary condition
-        $ref: '#/$defs/0D_signal'            
+        description: For type flux, total power for the whole boundary, regardless of mesh refinement.
+        $ref: '#/$defs/0D_signal'
     required:     
     - label
     - type

@@ -44,7 +44,7 @@ subroutine FSlink_init_part1(me,krn,cfg)
         nb_non_zeros_imp = (Nb_VarC+2)*me%sizeNodes
     else if(links(2)%has_key('label')) then
         allocate(me%nb_2D_Ports(me%sizeNodes))
-        labels=links(2)%str1d('label')
+        labels=links(2)%str1d('label', n=me%sizeNodes)
         do i = 1, me%sizeNodes
           me%nb_2D_Ports(i) = krn%FS_list%find_nbPorts(links(2)%str('id')//"+"//trim(labels(i)%p))
         enddo
@@ -86,7 +86,7 @@ subroutine FSlink_init_part2(me,krn,cfg)
             me%lk(1,i)%p => krn%FS_ports(offset1 + nodes1(i))
         enddo
 
-        nodes2=links(2)%int1d('node')
+        nodes2=links(2)%int1d('node', n=me%sizeNodes)
         name2=links(2)%str('id')
         offset2 = krn%FS_list%find(name2, 1) - 1
     
@@ -131,7 +131,7 @@ subroutine FSlink_init_part2(me,krn,cfg)
         allocate(me%MatrixPS_2D(2,maxval(me%nb_2D_Ports(:)),me%sizeNodes))
         allocate(me%MatrixSP_2D(Nb_VarC,maxval(me%nb_2D_Ports(:)),me%sizeNodes))
 
-        labels=links(2)%str1d('label')
+        labels=links(2)%str1d('label', n=me%sizeNodes)
         do i = 1, me%sizeNodes
             me%lk(1,i)%p => krn%FS_ports(offset1 + nodes1(i))
             do j=1,me%nb_2D_Ports(i)

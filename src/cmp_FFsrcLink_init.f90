@@ -67,7 +67,7 @@ subroutine FFsrcLink_init_part2(me,krn,cfg)
 
     links = cfg%dict1d('link')
     nodes1=links(1)%int1d('node')
-    nodes2=links(2)%int1d('node')
+    nodes2=links(2)%int1d('node', n=me%sizeNodes)
     offset1 = krn%FF_src_list%find(links(1)%str('id'), 1) - 1
     offset2 = krn%FF_src_list%find(links(2)%str('id'), 1) - 1
     do i = 1, me%sizeNodes

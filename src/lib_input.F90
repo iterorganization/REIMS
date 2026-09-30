@@ -324,7 +324,15 @@ function input_int1d(me,key,default_value,n) result(val)
         return
     class is(type_dictionary)
         tmp%root => node
-        if(get1d_range(tmp,val)) return
+        if(get1d_range(tmp,val)) then
+            if (present(n)) then
+                if (size(val) /= n) then
+                    print*, 'Expected '//to_str(n)//' elements for "'//key//'" but YAML has '//to_str(size(val))
+                    error stop 'Array size mismatch in YAML input.'
+                endif
+            endif
+            return
+        endif
     end select
     if(present(default_value)) return
     error stop 'Can not convert to 1d array of "integer" for key: '//key
@@ -369,12 +377,13 @@ function input_str(me,key,default_value) result(val)
     val = scalar%string
 end function input_str
 
-function input_str1d(me,key,default_value,empty) result(val)
+function input_str1d(me,key,default_value,empty,n) result(val)
     class(input_t), intent(in) :: me
     character(*), intent(in)   :: key
     type(str_ptr), optional, intent(in) :: default_value
     type(str_ptr), allocatable :: val(:)
-    logical,      optional, intent(in) :: empty    
+    logical,      optional, intent(in) :: empty
+    integer,      optional, intent(in) :: n !! expected number of elements in the array
 
     type(type_list_item), pointer :: item
     type(type_scalar),    pointer :: element
@@ -400,6 +409,12 @@ function input_str1d(me,key,default_value,empty) result(val)
             item => item%next
             i = i + 1
         enddo
+        if (present(n)) then
+            if (size(val) /= n) then
+                print*, 'Expected '//to_str(n)//' elements for "'//key//'" but YAML has '//to_str(size(val))
+                error stop 'Array size mismatch in YAML input.'
+            endif
+        endif
         return
     end select
     if(present(default_value)) return
