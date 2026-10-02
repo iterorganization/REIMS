@@ -8,8 +8,7 @@ correlations, signals, and material properties.
 All interfaces follow the C calling convention (``bind(C)``), so the DLL can be
 written in any language capable of producing a Windows DLL whose functions are
 directly callable by other programs — such as Fortran, C, C++, etc.
-The examples in this guide and in
-``tests/dynamic_lib/`` use Intel Fortran (ifx), but the interfaces are identical
+The examples in this guide use Intel Fortran (ifx), but the interfaces are identical
 in any other language. Only the export syntax differs (``__declspec(dllexport)``
 in C/C++ instead of ``!DIR$ ATTRIBUTES DLLEXPORT`` in Fortran).
 

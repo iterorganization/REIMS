@@ -536,6 +536,22 @@
       "args": [
         "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_9.yaml"
       ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Debug\\reims.exe)",
+      "name": "Training_Exo_10 debug",
+      "args": [
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_10.yaml"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "reims.exe (src\\Release\\reims.exe)",
+      "name": "Training_Exo_10 release",
+      "args": [
+        "${cmake.binaryDir}/../../reims_training/exercises/Training_Exo_10.yaml"
+      ]
     }
   ]
 }
