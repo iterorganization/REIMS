@@ -1209,6 +1209,9 @@ $defs:
     description: |
       .. code:: yaml
 
+        Example (constant value):
+          p: 500000   # Constant value, valid for all time
+
         Example:
           p:                          # Pressure
             time:   [     0,	   100] # Time scenario (s)
@@ -1271,6 +1274,9 @@ $defs:
     description: |
       .. code:: yaml
 
+        Example (constant value):
+          flux: 100.0   # Constant value, valid for all time and space
+
         Example:
           flux:                          # Heat load
             time:  [   0,  100]          # Time scenario (s)     - 2 instants
@@ -1281,7 +1287,7 @@ $defs:
                                          # value dimension is [n_x=3 x n_time=2]
             order:  0                    # 0 order in time
             repeat: 0                    # No scenario repeat
-            event:  implicit             # 3 consecutive explicit steps are enforced each time the simulation
+            event:  implicit             # 1 implicit step is enforced each time the simulation
                                          # physical time reaches one of the values specified in 'time'
 
         Example (in case of an external DLL):
